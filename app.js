@@ -264,7 +264,7 @@ const VIEWS = {
     });
     h += `<div class="src">${T("Arabcha matn")}: <a href="https://tanzil.net" target="_blank" rel="noopener">Tanzil Project</a> (Uthmani 1.1, CC BY 3.0).
       ${tr ? `${T("Tarjima")}: ${trCredit()} — <a href="https://quranenc.com" target="_blank" rel="noopener">QuranEnc.com</a>.` : ""}
-      ${T("Audio")}: Quran.com (Quran Foundation).
+      ${T("Audio")}: ${T("qori")} <span id="recname">${esc(reciter().name)}</span> — <a href="https://quran.foundation" target="_blank" rel="noopener">Quran Foundation</a> (verses.quran.com).
       ${meta.uz ? `${T("Sura nomi (o'zbekcha)")}: <a href="https://quranenc.com/uz/browse/uzbek_sadiq/${n}" target="_blank" rel="noopener">QuranEnc.com</a>.` : ""} <br>${T("Holat: olim tekshiruvi kutilmoqda.")}</div></div>
       <div class="row" style="justify-content:space-between">${n > 1 ? `<button class="btn2" data-open="${n - 1}">← ${esc(sname(SURAS[n - 2]))}</button>` : "<span></span>"}
       ${n < 114 ? `<button class="btn2" data-open="${n + 1}">${esc(sname(SURAS[n]))} →</button>` : ""}</div>`;
@@ -352,7 +352,7 @@ const VIEWS = {
     <li>${T("O'zbekcha tarjima")}: QuranEnc.com — uzbek_sadiq (${T("versiya aniqlanmadi")}).</li>
     <li>${T("Ruscha tarjima")}: QuranEnc.com — russian_rwwad (${T("versiya aniqlanmadi")}).</li>
     <li>${T("Inglizcha tarjima")}: QuranEnc.com — english_saheeh, ${T("versiya")} 1.1.2.</li>
-    <li>${T("Audio")}: Quran.com / Quran Foundation (verses.quran.com).</li>
+    <li>${T("Audio")}: <a href="https://quran.foundation" target="_blank" rel="noopener">Quran Foundation</a> (verses.quran.com), ${T("qorilar")}: ${RECITERS.map(r => esc(r.name)).join(", ")}. ${T("Audio ularning saytidan eshittiriladi, ilovada saqlanmaydi")} (<a href="https://api-docs.quran.foundation/legal/developer-terms/" target="_blank" rel="noopener">${T("shartlar")}</a>).</li>
     <li>${T("Namoz vaqtlari")}: Aladhan API (${T("taxminiy")}), ${T("Idora Fatvo markazining taqvim botiga moslangan")}; ${T("rasmiy")}: <a href="https://t.me/fatvouz_taqvim_bot" target="_blank" rel="noopener">@fatvouz_taqvim_bot</a>, <a href="https://muslim.uz" target="_blank" rel="noopener">muslim.uz</a>.</li>
     <li>${T("Sura nomlari (o'zbekcha)")}: <a href="https://quranenc.com/uz/browse/uzbek_sadiq/1" target="_blank" rel="noopener">QuranEnc.com</a> — ${T("o'zgartirilmagan, kirillda. Olim tekshiruvi kerak.")}</li>
     <li>${T("Tasbeh zikrlari")}: <a href="https://sunnah.com/bukhari" target="_blank" rel="noopener">sunnah.com</a> — Sahih al-Bukhari 843, 6403, 6405; ${T("tarjima va solishtirish")}: <a href="https://hadeethenc.com" target="_blank" rel="noopener">HadeethEnc</a>. ${T("843 va 6403 ning o'zbekcha tarjimasi manbada yo'q: ularni {Claude} (sun'iy intellekt) manbadagi inglizcha/ruscha matndan o'girgan, bu manba emas.")} ${T("Olim tekshiruvi kerak.")}</li>
@@ -529,7 +529,7 @@ document.addEventListener("click", e => {
   }
 });
 document.addEventListener("change", e => {
-  if (e.target.id === "rec") { st.reciter = +e.target.value; save("reciter"); if (pl.sura) playAyah(pl.sura, pl.ayah); }
+  if (e.target.id === "rec") { st.reciter = +e.target.value; save("reciter"); if ($("#recname")) $("#recname").textContent = reciter().name; if (pl.sura) playAyah(pl.sura, pl.ayah); }
   if (e.target.id === "autonext") { st.autoNext = e.target.checked; save("autoNext"); }
 });
 
