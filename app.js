@@ -70,10 +70,15 @@ const REGIONS = {
 /* Hisob: Fajr/Isha 15°, Asr — Hanafiy; Idora ({muslim.uz}) jadvaliga 2026-11-25 Toshkent bo'yicha moslashtirilgan. Taxminiy. */
 const PT_QS = "method=99&methodSettings=15,null,15&school=1&tune=0,-3,-4,5,-1,3,0,-1,0";
 const MAKKAH = [21.4225, 39.8262];
-/* Rasmiy jonli efir kanallari: tasdiqlangandan keyingina shu yerga YouTube kanal ID yoziladi. */
+/* Rasmiy jonli efir kanallari (Saudiya Radio va Televideniye idorasi, SBA). 2026-11-25 tekshirildi:
+   YouTube tasdiq belgisi bor, kanal tavsifida SBA'ga tegishli deyilgan, jonli efir ishlaydi va embed ruxsat etilgan.
+   sba.sa saytidagi havola hali tekshirilmadi (sayt ochilmadi).
+   `video` — kanalning hozirgi jonli efiri (2026-11-25). Makka kanali uchun `live_stream?channel=` embed'i
+   "Video mavjud emas" ko'rsatdi, shuning uchun aniq video ID birinchi ishlatiladi. Efir qayta boshlansa ID
+   o'zgaradi: unda youtube.com/channel/<channel>/live dan yangi ID'ni olib yozing. */
 const LIVE = [
-  { key: "makka", title: "Makka — Masjidul Harom", channel: "" },
-  { key: "madina", title: "Madina — Masjidun Nabaviy", channel: "" }
+  { key: "makka", title: "Makka — Masjidul Harom", channel: "UCos52azQNBgW63_9uDJoPDA", video: "IsJTAdC3-Jw", name: "قناة القرآن الكريم", handle: "@SaudiQuranTv" },
+  { key: "madina", title: "Madina — Masjidun Nabaviy", channel: "UCROKYPep-UuODNwyipe6JMw", video: "DLnqQHiDbaI", name: "قناة السنة النبوية", handle: "@SaudiSunnahTv" }
 ];
 const HMONTHS = ["Muharram", "Safar", "Rabiul avval", "Rabiul oxir", "Jumodul avval", "Jumodul oxir", "Rajab", "Sha'bon", "Ramazon", "Shavvol", "Zulqa'da", "Zulhijja"];
 const GMONTHS = ["yanvar", "fevral", "mart", "aprel", "may", "iyun", "iyul", "avgust", "sentabr", "oktabr", "noyabr", "dekabr"];
@@ -291,8 +296,9 @@ const VIEWS = {
   },
   async jonli() {
     return LIVE.map(l => `<div class="card"><h2>${T(l.title)}</h2><div class="vid">${l.channel
-      ? `<iframe src="https://www.youtube-nocookie.com/embed/live_stream?channel=${encodeURIComponent(l.channel)}" title="${esc(l.title)}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>`
-      : `<span class="mut">${T("Rasmiy kanal hali tasdiqlanmadi. Saudiya rasmiy kanali ({SBA}) aniqlangach shu yerda jonli efir ochiladi.")}</span>`}</div></div>`).join("");
+      ? `<iframe src="https://www.youtube-nocookie.com/embed/${l.video ? encodeURIComponent(l.video) : `live_stream?channel=${encodeURIComponent(l.channel)}`}" title="${esc(l.title)}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>`
+      : `<span class="mut">${T("Rasmiy kanal hali tasdiqlanmadi. Saudiya rasmiy kanali ({SBA}) aniqlangach shu yerda jonli efir ochiladi.")}</span>`}</div>${l.channel
+      ? `<p class="mut">${T("Manba")}: <a href="https://www.youtube.com/channel/${encodeURIComponent(l.channel)}" target="_blank" rel="noopener">${esc(l.name)} (${esc(l.handle)})</a> — ${T("Saudiya Radio va Televideniye idorasi ({SBA}) rasmiy kanali.")}<br>${T("Video ochilmasa")}: <a href="https://www.youtube.com/channel/${encodeURIComponent(l.channel)}/live" target="_blank" rel="noopener">${T("{YouTube}'da ochish")}</a></p>` : ""}</div>`).join("");
   },
   async tajvid() {
     return `<div class="card"><h2>${T("Tajvid")}</h2>
@@ -329,7 +335,8 @@ const VIEWS = {
     <li>${T("Ruscha tarjima")}: QuranEnc.com — russian_rwwad (${T("versiya aniqlanmadi")}).</li>
     <li>${T("Inglizcha tarjima")}: QuranEnc.com — english_saheeh, ${T("versiya")} 1.1.2.</li>
     <li>${T("Audio")}: Quran.com / Quran Foundation (verses.quran.com).</li>
-    <li>${T("Namoz vaqtlari")}: Aladhan API (${T("taxminiy")}); ${T("rasmiy")}: <a href="https://muslim.uz" target="_blank" rel="noopener">muslim.uz</a>.</li></ul>
+    <li>${T("Namoz vaqtlari")}: Aladhan API (${T("taxminiy")}); ${T("rasmiy")}: <a href="https://muslim.uz" target="_blank" rel="noopener">muslim.uz</a>.</li>
+    <li>${T("Jonli efir")}: ${LIVE.map(l => `<a href="https://www.youtube.com/channel/${encodeURIComponent(l.channel)}" target="_blank" rel="noopener">${esc(l.handle)}</a>`).join(", ")} — ${T("Saudiya Radio va Televideniye idorasi ({SBA}), YouTube.")}</li></ul>
     <p class="mut">${T("Arabcha matn ikkinchi manba ({QuranEnc}) bilan 6236 oyat bo'yicha solishtirildi. Natija: {docs/tekshiruv-hisoboti.md}.")}</p>
     <div class="note">${T("Sinov versiyasi. O'zbekiston musulmonlari idorasi tasdiqlamaguncha ommaga chiqarilmaydi.")}</div></div>`;
   }

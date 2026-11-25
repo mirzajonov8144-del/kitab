@@ -51,7 +51,7 @@ Ishlaydi:
 
 Qilinishi kerak (kamchiliklar):
 1. **Arabcha matn farqlari:** 355 oyatda Tanzil va QuranEnc arabcha matni farq qiladi (iqlob tanvini, kichik yo/vov, vaqf belgilari). Olim qaysi nashrni olishni aytishi kerak. Batafsil: `docs/tekshiruv-hisoboti.md`.
-2. **Makka/Madina jonli efiri:** `app.js` dagi `LIVE[].channel` bo'sh. Saudiya Broadcasting Authority'ning rasmiy YouTube kanal ID'sini (UC…) aniqlab yozing. Kanal rasmiy ekanligini tekshiring: tasdiq belgisi bo'lsin, sba.sa saytidan havola bo'lsin.
+2. **Makka/Madina jonli efiri (qisman bajarildi, 2026-11-25):** `LIVE` da Makka — @SaudiQuranTv (`UCos52azQNBgW63_9uDJoPDA`), Madina — @SaudiSunnahTv (`UCROKYPep-UuODNwyipe6JMw`). Ikkalasida YouTube tasdiq belgisi bor, tavsifida SBA'ga tegishli deyilgan. QOLDI: sba.sa saytidan havola tekshirilmadi (sayt bizdan ham, bulutdan ham ochilmadi). Makka kanali uchun `live_stream?channel=` embed'i ishlamadi, shuning uchun `LIVE[].video` (hozirgi efir ID'si) ishlatiladi: efir qayta boshlansa uni yangilang.
 3. **Tajvid:** hozircha faqat bo'sh sahifa. Darslar Idora manbasidan olinadi. Quran.com `text_uthmani_tajweed` matnidan foydalanmang: unda U+0670 o'rniga U+0672 turadi.
 4. **Tasbeh zikr matnlari:** faqat manbadan (Idora yoki sahih hadis), iqtibos bilan.
 5. **Namoz vaqtlari:** boshqa kunlar va hududlar Idora jadvali bilan tekshirilmagan. Ramazon taqvimi chiqqach, uni Idoraning rasmiy taqvimi bilan almashtiring.
