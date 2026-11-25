@@ -21,6 +21,8 @@ Qur'on o'quv ilovasi. Telefon uchun PWA, build (yig'ish) bosqichi yo'q: oddiy HT
 | `sw.js` | Oflayn kesh. Fayl o'zgarsa, `V` versiyasini oshiring |
 | `data/suras.json` | 114 sura: nomi, oyatlar soni, Makkiy/Madaniy |
 | `data/s/NNN.json` | Har bir sura: `ar` (Tanzil), `uz`/`ru`/`en` tarjimalari va `*_fn` izohlari (QuranEnc) |
+| `data/zikr.json` | Tasbeh zikrlari: sunnah.com (Buxoriy) matni, HadeethEnc tarjimasi va solishtiruvi |
+| `tools/build_zikr.py` | `data/zikr.json` ni manbalardan yig'adi: `python -I -X utf8 tools/build_zikr.py data` |
 | `data/TANZIL-LICENSE.txt` | Tanzil litsenziyasi. O'chirmang |
 | `tools/build_data.py` | `data/` ni manba fayllardan qayta yig'adi |
 | `tools/verify_arabic.py` | Tanzil va QuranEnc arabcha matnini harfma-harf solishtiradi |
@@ -52,8 +54,8 @@ Ishlaydi:
 Qilinishi kerak (kamchiliklar):
 1. **Arabcha matn farqlari:** 355 oyatda Tanzil va QuranEnc arabcha matni farq qiladi (iqlob tanvini, kichik yo/vov, vaqf belgilari). Olim qaysi nashrni olishni aytishi kerak. Batafsil: `docs/tekshiruv-hisoboti.md`.
 2. **Makka/Madina jonli efiri (qisman bajarildi, 2026-11-25):** `LIVE` da Makka — @SaudiQuranTv (`UCos52azQNBgW63_9uDJoPDA`), Madina — @SaudiSunnahTv (`UCROKYPep-UuODNwyipe6JMw`). Ikkalasida YouTube tasdiq belgisi bor, tavsifida SBA'ga tegishli deyilgan. QOLDI: sba.sa saytidan havola tekshirilmadi (sayt bizdan ham, bulutdan ham ochilmadi). Makka kanali uchun `live_stream?channel=` embed'i ishlamadi, shuning uchun `LIVE[].video` (hozirgi efir ID'si) ishlatiladi: efir qayta boshlansa uni yangilang.
-3. **Tajvid:** hozircha faqat bo'sh sahifa. Darslar Idora manbasidan olinadi. Quran.com `text_uthmani_tajweed` matnidan foydalanmang: unda U+0670 o'rniga U+0672 turadi.
-4. **Tasbeh zikr matnlari:** faqat manbadan (Idora yoki sahih hadis), iqtibos bilan.
+3. **Tajvid:** hozircha faqat bo'sh sahifa. Darslar Idora manbasidan olinadi. 2026-11-25: muslim.uz va old.muslim.uz'da tajvid darslari topilmadi, egasi manba berishi kerak. Quran.com `text_uthmani_tajweed` matnidan foydalanmang: unda U+0670 o'rniga U+0672 turadi.
+4. **Tasbeh zikr matnlari (qisman, 2026-11-25):** 3 ta zikr qo'shildi: Buxoriy 843 (namozdan keyin 33 tadan), 6405 (100), 6403 (100). Ma'lumot `data/zikr.json`, uni `tools/build_zikr.py` yig'adi. Zikr iborasi sunnah.com'dagi hadis matnidan harfma-harf kesib olinadi. Uchala zikrda ham HadeethEnc bilan harakat farqi bor (masalan, «اللَّهِ» / «اللهِ»), ikkalasi "FARQ BOR" deb ko'rsatiladi. QOLDI: olim qaysi imloni olishni aytishi kerak. 6403 uchun o'zbekcha tarjima yo'q (faqat ruscha), 843 uchun faqat inglizcha bor. Idora (muslim.uz) zikr manbasi topilmadi. Hammasi "Olim tekshiruvi kerak" holatida.
 5. **Namoz vaqtlari:** boshqa kunlar va hududlar Idora jadvali bilan tekshirilmagan. Ramazon taqvimi chiqqach, uni Idoraning rasmiy taqvimi bilan almashtiring.
 6. **Sura nomlari:** hozir faqat arabcha va Quran.com transliteratsiyasida. O'zbekcha nomlarni manbadan oling.
 7. **Audio litsenziyasi:** Google Play'dan oldin Quran Foundation API shartlarini tekshiring va API kaliti oling.

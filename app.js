@@ -1,6 +1,6 @@
 "use strict";
 /* Kitab — o'quv ilovasi (sinov versiyasi).
-   Diniy matnlar faqat data/ papkasidagi manba fayllardan olinadi (Tanzil, QuranEnc).
+   Diniy matnlar faqat data/ papkasidagi manba fayllardan olinadi (Tanzil, QuranEnc, sunnah.com, HadeethEnc).
    Bu faylda hech qanday oyat, tarjima, duo yoki hadis matni yozilmagan. */
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -93,6 +93,8 @@ const LETTERS = [
 let SURAS = [];
 const suraCache = new Map();
 async function getJSON(url) { const r = await fetch(url); if (!r.ok) throw new Error(r.status); return r.json(); }
+let zikrCache = null;
+async function loadZikr() { return zikrCache ||= await getJSON("data/zikr.json"); }
 async function loadSura(n) {
   if (!suraCache.has(n)) suraCache.set(n, await getJSON(`data/s/${String(n).padStart(3, "0")}.json`));
   return suraCache.get(n);
@@ -268,12 +270,21 @@ const VIEWS = {
   },
   async tasbeh() {
     const c = store.get("tcount", 0), goal = store.get("tgoal", 33), rounds = store.get("trounds", 0);
-    return `<div class="card" style="text-align:center">
+    let Z = [];
+    try { Z = await loadZikr(); } catch {}
+    const sel = Z.find(z => z.id === store.get("tzikr", ""));
+    const top = sel ? `<p class="ar zk-now" id="tz" dir="rtl" lang="ar">${esc(sel.phrases[rounds % sel.phrases.length])}</p>
+      ${sel.second?.compare.some(x => x.farq) ? `<p class="mut"><span class="farq-badge">FARQ BOR</span> ${T("Ikki manbada harakatlar farq qiladi — pastda ikkalasi ko'rsatilgan.")}</p>` : ""}` : "";
+    return `<div class="card" style="text-align:center">${top}
       <button class="counter" id="tap" aria-label="${T("Sanash")}"><span><span id="tc">${c}</span><small id="tg">${goal ? "/ " + goal : "∞"} · ${T("davra")}: <span id="tr">${rounds}</span></small></span></button>
       <div class="row" style="justify-content:center">${[33, 99, 100, 0].map(g => `<button class="ib" data-goal="${g}" aria-pressed="${g === goal}">${g || "∞"}</button>`).join("")}</div>
       <div class="row" style="justify-content:center"><button class="btn2" id="treset">${T("Nolga qaytarish")}</button></div>
       <p class="mut">${T("Ekranning istalgan joyiga emas, faqat doiraga bosing. Maqsadga yetganda telefon titraydi.")}</p>
-      <div class="note">${T("Zikr matnlari manbadan (Idora) olingach qo'shiladi.")}</div></div>`;
+    </div>
+    <div class="card"><h2>${T("Zikrlar")}</h2>
+      <div class="note">${T("Olim tekshiruvi kerak. Matnlar manbadan o'zgarishsiz olingan: hadis — {sunnah.com} (Sahih al-Buxoriy), tarjima — {HadeethEnc}.")}</div>
+      ${Z.length ? Z.map(z => zikrCard(z, sel)).join("") : `<p class="mut">${T("Zikr matnlarini yuklab bo'lmadi. Internetni tekshiring.")}</p>`}
+    </div>`;
   },
   async qibla() {
     const reg = REGIONS[st.region];
@@ -336,12 +347,38 @@ const VIEWS = {
     <li>${T("Inglizcha tarjima")}: QuranEnc.com — english_saheeh, ${T("versiya")} 1.1.2.</li>
     <li>${T("Audio")}: Quran.com / Quran Foundation (verses.quran.com).</li>
     <li>${T("Namoz vaqtlari")}: Aladhan API (${T("taxminiy")}); ${T("rasmiy")}: <a href="https://muslim.uz" target="_blank" rel="noopener">muslim.uz</a>.</li>
+    <li>${T("Tasbeh zikrlari")}: <a href="https://sunnah.com/bukhari" target="_blank" rel="noopener">sunnah.com</a> — Sahih al-Bukhari 843, 6403, 6405; ${T("tarjima va solishtirish")}: <a href="https://hadeethenc.com" target="_blank" rel="noopener">HadeethEnc</a>. ${T("Olim tekshiruvi kerak.")}</li>
     <li>${T("Jonli efir")}: ${LIVE.map(l => `<a href="https://www.youtube.com/channel/${encodeURIComponent(l.channel)}" target="_blank" rel="noopener">${esc(l.handle)}</a>`).join(", ")} — ${T("Saudiya Radio va Televideniye idorasi ({SBA}), YouTube.")}</li></ul>
     <p class="mut">${T("Arabcha matn ikkinchi manba ({QuranEnc}) bilan 6236 oyat bo'yicha solishtirildi. Natija: {docs/tekshiruv-hisoboti.md}.")}</p>
     <div class="note">${T("Sinov versiyasi. O'zbekiston musulmonlari idorasi tasdiqlamaguncha ommaga chiqarilmaydi.")}</div></div>`;
   }
 };
 
+/* Zikr kartasi: matnlar data/zikr.json dan (tools/build_zikr.py), bu yerda hech narsa yozilmaydi. Tarjimalar T() dan o'tmaydi. */
+function zikrCard(z, sel) {
+  const num = z.source.url.split(":").pop(), on = sel?.id === z.id;
+  const arP = s => `<span class="ar" dir="rtl" lang="ar">${esc(s)}</span>`;
+  const farq = (z.second?.compare || []).filter(x => x.farq);
+  const tr = z.uz
+    ? `<p class="tr" lang="uz-Cyrl">${esc(z.uz.text)}</p><p class="src">${T("Tarjima")}: <a href="${esc(z.uz.url)}" target="_blank" rel="noopener">HadeethEnc</a> — ${esc(z.uz.attribution)}, ${esc(z.uz.grade)}. ${T("Olingan")}: ${esc(z.uz.retrieved)}.</p>`
+    : z.ru
+      ? `<p class="mut">${T("O'zbekcha tarjima manbada topilmadi. Ruscha tarjima:")}</p><p class="tr" lang="ru">${esc(z.ru.text)}</p><p class="src">${T("Tarjima")}: <a href="${esc(z.ru.url)}" target="_blank" rel="noopener">HadeethEnc</a> — ${esc(z.ru.attribution)}, ${esc(z.ru.grade)}. ${T("Olingan")}: ${esc(z.ru.retrieved)}.</p>`
+      : `<p class="mut">${T("O'zbekcha va ruscha tarjima manbada topilmadi. Inglizcha tarjima ({sunnah.com}):")}</p><p class="tr" lang="en">${esc(z.en)}</p>`;
+  return `<div class="zk${on ? " on" : ""}">
+    <div class="zk-ph">${z.phrases.map(arP).join("")}</div>
+    <div class="row"><b class="zk-n">× ${z.count}${z.phrases.length > 1 ? " " + T("(har biri)") : ""}</b>
+      <button class="btn2" data-zikr="${esc(z.id)}" aria-pressed="${on}">${T(on ? "Tanlangan" : "Tanlash")}</button></div>
+    ${farq.length ? `<div class="farq"><b class="farq-badge">FARQ BOR</b>
+      <p class="mut">${T("Ikki manbada harakatlar farq qiladi. Qaysi biri olinishini olim aytadi.")}</p>
+      ${farq.map(x => `<div class="farq-row"><div><small>sunnah.com</small>${arP(x.sunnah)}</div><div><small>HadeethEnc #${esc(z.second.id)}</small>${arP(x.hadeethenc)}</div></div>`).join("")}
+      ${z.second.same_hadith ? "" : `<p class="src">${T("{HadeethEnc}'dagi matn boshqa hadis (#{" + z.second.id + "}): u faqat iboraning imlosini solishtirish uchun olingan.")}</p>`}</div>` : ""}
+    <details><summary>${T("Manba va tarjima")}</summary>
+      <p class="src">${T("Manba")}: <a href="${esc(z.source.url)}" target="_blank" rel="noopener">Sahih al-Bukhari ${esc(num)}</a> — sunnah.com. ${T("Daraja")}: ${T("sahih")}. ${T("Olingan")}: ${esc(z.source.retrieved)}.</p>
+      ${tr}
+      <p class="mut">${T("Hadisning to'liq arabcha matni")}:</p><p class="ar zk-full" dir="rtl" lang="ar">${esc(z.hadith_ar)}</p>
+    </details>
+  </div>`;
+}
 function trCredit() { return { uz: T("Shayx Muhammad Sodiq Muhammad Yusuf ({uzbek_sadiq})"), ru: "Rowwad (russian_rwwad)", en: "Saheeh International (english_saheeh 1.1.2)" }[st.tr] || ""; }
 function regionOpts() { return Object.entries(REGIONS).map(([k, r]) => `<option value="${k}" ${k === st.region ? "selected" : ""}>${T(r[0])}</option>`).join(""); }
 function suraItems(q) {
@@ -391,10 +428,19 @@ const AFTER = {
   },
   tasbeh() {
     let c = store.get("tcount", 0), goal = store.get("tgoal", 33), rounds = store.get("trounds", 0);
-    const draw = () => { $("#tc").textContent = c; $("#tr").textContent = rounds; store.set("tcount", c); store.set("trounds", rounds); };
+    const sel = (zikrCache || []).find(z => z.id === store.get("tzikr", ""));
+    const draw = () => {
+      $("#tc").textContent = c; $("#tr").textContent = rounds; store.set("tcount", c); store.set("trounds", rounds);
+      if (sel && $("#tz")) $("#tz").textContent = sel.phrases[rounds % sel.phrases.length];
+    };
     $("#tap").onclick = () => { c++; if (goal && c >= goal) { rounds++; c = 0; navigator.vibrate?.([80, 60, 80]); } else navigator.vibrate?.(15); draw(); };
     $("#treset").onclick = () => { c = 0; rounds = 0; draw(); };
-    document.querySelectorAll("[data-goal]").forEach(b => b.onclick = () => { store.set("tgoal", +b.dataset.goal); render(); });
+    document.querySelectorAll("[data-goal]").forEach(b => b.onclick = () => { store.set("tgoal", +b.dataset.goal); store.set("tzikr", ""); render(); });
+    document.querySelectorAll("[data-zikr]").forEach(b => b.onclick = () => {
+      const z = zikrCache.find(x => x.id === b.dataset.zikr), off = z.id === store.get("tzikr", "");
+      store.set("tzikr", off ? "" : z.id); if (!off) store.set("tgoal", z.count);
+      store.set("tcount", 0); store.set("trounds", 0); render(); scrollTo({ top: 0, behavior: "smooth" });
+    });
   },
   qibla() {
     let target = bearing(REGIONS[st.region][1], REGIONS[st.region][2]);
