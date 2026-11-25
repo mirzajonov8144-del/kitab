@@ -59,7 +59,7 @@ const RECITERS = [
   { id: 4, name: "Abu Bakr al-Shatri", dir: "Shatri/mp3/" },
   { id: 5, name: "Hani ar-Rifai", dir: "Rifai/mp3/" }
 ];
-const AUDIO_BASE = "https://verses.quran.com/";
+const AUDIO_BASE = "https://verses.quran.foundation/";
 const REGIONS = {
   toshkent: ["Toshkent", 41.2995, 69.2401], andijon: ["Andijon", 40.7821, 72.3442], namangan: ["Namangan", 40.9983, 71.6726],
   fargona: ["Farg'ona", 40.3864, 71.7864], samarqand: ["Samarqand", 39.6542, 66.9597], buxoro: ["Buxoro", 39.7747, 64.4286],
@@ -264,7 +264,7 @@ const VIEWS = {
     });
     h += `<div class="src">${T("Arabcha matn")}: <a href="https://tanzil.net" target="_blank" rel="noopener">Tanzil Project</a> (Uthmani 1.1, CC BY 3.0).
       ${tr ? `${T("Tarjima")}: ${trCredit()} — <a href="https://quranenc.com" target="_blank" rel="noopener">QuranEnc.com</a>.` : ""}
-      ${T("Audio")}: ${T("qori")} <span id="recname">${esc(reciter().name)}</span> — <a href="https://quran.foundation" target="_blank" rel="noopener">Quran Foundation</a> (verses.quran.com).
+      ${T("Audio")}: ${T("qori")} <span id="recname">${esc(reciter().name)}</span> — <a href="https://quran.foundation" target="_blank" rel="noopener">Quran Foundation</a> (verses.quran.foundation).
       ${meta.uz ? `${T("Sura nomi (o'zbekcha)")}: <a href="https://quranenc.com/uz/browse/uzbek_sadiq/${n}" target="_blank" rel="noopener">QuranEnc.com</a>.` : ""} <br>${T("Holat: olim tekshiruvi kutilmoqda.")}</div></div>
       <div class="row" style="justify-content:space-between">${n > 1 ? `<button class="btn2" data-open="${n - 1}">← ${esc(sname(SURAS[n - 2]))}</button>` : "<span></span>"}
       ${n < 114 ? `<button class="btn2" data-open="${n + 1}">${esc(sname(SURAS[n]))} →</button>` : ""}</div>`;
@@ -366,7 +366,7 @@ const VIEWS = {
     <li>${T("Ruscha tarjima")}: QuranEnc.com — russian_rwwad, ${T("versiya")} V1.0.1 (29.03.2026).</li>
     <li>${T("Inglizcha tarjima")}: QuranEnc.com — english_saheeh, ${T("versiya")} 1.1.2.</li>
     <li>${T("Tarjimalar")} <a href="https://quranenc.com/en/home#transes" target="_blank" rel="noopener">QuranEnc.com</a> ${T("shartlari bo'yicha o'zgartirilmasdan beriladi. Xato topsangiz, {QuranEnc.com}'ga xabar bering.")}</li>
-    <li>${T("Audio")}: <a href="https://quran.foundation" target="_blank" rel="noopener">Quran Foundation</a> (verses.quran.com), ${T("qorilar")}: ${RECITERS.map(r => esc(r.name)).join(", ")}. ${T("Audio ularning saytidan eshittiriladi, ilovada saqlanmaydi")} (<a href="https://api-docs.quran.foundation/legal/developer-terms/" target="_blank" rel="noopener">${T("shartlar")}</a>).</li>
+    <li>${T("Audio")}: <a href="https://quran.foundation" target="_blank" rel="noopener">Quran Foundation</a> (verses.quran.foundation), ${T("qorilar")}: ${RECITERS.map(r => esc(r.name)).join(", ")}. ${T("Audio ularning saytidan eshittiriladi, ilovada saqlanmaydi")} (<a href="https://api-docs.quran.foundation/legal/developer-terms/" target="_blank" rel="noopener">${T("shartlar")}</a>).</li>
     <li>${T("Namoz vaqtlari")}: Aladhan API (${T("taxminiy")}), ${T("Idora Fatvo markazining taqvim botiga moslangan")}; ${T("rasmiy")}: <a href="https://t.me/fatvouz_taqvim_bot" target="_blank" rel="noopener">@fatvouz_taqvim_bot</a>, <a href="https://muslim.uz" target="_blank" rel="noopener">muslim.uz</a>.</li>
     <li>${T("Sura nomlari (o'zbekcha)")}: <a href="https://quranenc.com/uz/browse/uzbek_sadiq/1" target="_blank" rel="noopener">QuranEnc.com</a> — ${T("o'zgartirilmagan, kirillda. Olim tekshiruvi kerak.")}</li>
     <li>${T("Tasbeh zikrlari")}: <a href="https://sunnah.com/bukhari" target="_blank" rel="noopener">sunnah.com</a> — Sahih al-Bukhari 843, 6403, 6405; ${T("tarjima va solishtirish")}: <a href="https://hadeethenc.com" target="_blank" rel="noopener">HadeethEnc</a>. ${T("843 va 6403 ning o'zbekcha tarjimasi manbada yo'q: ularni {Claude} (sun'iy intellekt) manbadagi inglizcha/ruscha matndan o'girgan, bu manba emas.")} ${T("Olim tekshiruvi kerak.")}</li>
