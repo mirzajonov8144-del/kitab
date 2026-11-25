@@ -318,10 +318,23 @@ const VIEWS = {
       : `<span class="mut">${T("Rasmiy kanal hali tasdiqlanmadi. Saudiya rasmiy kanali ({SBA}) aniqlangach shu yerda jonli efir ochiladi.")}</span>`}</div>${l.channel
       ? `<p class="mut">${T("Manba")}: <a href="https://www.youtube.com/channel/${encodeURIComponent(l.channel)}" target="_blank" rel="noopener">${esc(l.name)} (${esc(l.handle)})</a> — ${T("Saudiya Radio va Televideniye idorasi ({SBA}) rasmiy kanali.")}<br>${T("Video ochilmasa")}: <a href="https://www.youtube.com/channel/${encodeURIComponent(l.channel)}/live" target="_blank" rel="noopener">${T("{YouTube}'da ochish")}</a></p>` : ""}</div>`).join("");
   },
+  /* Tajvid: data/tajvid.json (tools/build_tajvid.py). Izohlar — Claude yozgan, manba emas; misollar — Tanzil matnidan kesilgan. */
   async tajvid() {
+    let d = null;
+    try { d = await getJSON("data/tajvid.json"); } catch {}
+    if (!d) return `<div class="card"><h2>${T("Tajvid")}</h2><p class="mut">${T("Darslarni yuklab bo'lmadi. Internetni tekshiring.")}</p></div>`;
+    const ex = e => { const [s] = e.ref.split(":"); return `<a class="tj-ex" href="#sura/${s}"><span class="ar" dir="rtl" lang="ar">${esc(e.ar)}</span><small>${esc(e.ref)}</small></a>`; };
     return `<div class="card"><h2>${T("Tajvid")}</h2>
-    <p>${T("Tajvid darslari faqat ishonchli manbadan (O'zbekiston musulmonlari idorasi darsliklari) olinadi. Matnni o'zimizdan yozmaymiz.")}</p>
-    <div class="note">${T("Bo'lim tayyorlanmoqda: manba tanlanishi va olim tekshiruvi kutilmoqda.")}</div></div>`;
+      <div class="ai-tr"><b class="farq-badge">${T("Manba emas")}</b>
+      <p class="mut">${T("Qoidalar izohini {Claude} (sun'iy intellekt) yozgan. Ilova bitgach, O'zbekiston musulmonlari idorasi tekshiradi.")} ${T("Rivoyat")}: ${T("Hafs, Osimdan")}.</p>
+      <p class="src">${T("Misollar Qur'on matnidan ({Tanzil}, {Uthmani 1.1}) harfma-harf olingan, qoidaga mosligi dastur bilan tekshirilgan. Misolga bossangiz, sura ochiladi.")}</p></div></div>
+      ${d.lessons.map(L => `<div class="card"><details class="tj"><summary><h2>${T(L.title)}</h2></summary>
+        <p>${T(L.intro)}</p>
+        ${L.rules.map(r => `<div class="tj-rule"><h3>${T(r.name)}</h3>
+          ${r.letters ? `<p class="tj-l"><span class="ar" dir="rtl" lang="ar">${esc(r.letters)}</span></p>` : ""}
+          ${r.text ? `<p>${T(r.text)}</p>` : ""}
+          <div class="tj-exs">${r.ex.map(ex).join("")}</div></div>`).join("")}
+      </details></div>`).join("")}`;
   },
   async harflar() {
     return `<div class="card"><p class="mut">${T("Harfga bosing — uning so'z boshida, o'rtasida va oxiridagi shakli chiqadi.")}</p>
