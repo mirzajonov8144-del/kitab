@@ -1,0 +1,85 @@
+# Kitab: Claude Code uchun yo'riqnoma
+
+Egasi: Mc Raximjon (GitHub: mirzajonov8144-del). U texnik mutaxassis emas.
+- Javoblarni o'zbek tilida (lotin yozuvida), oddiy so'zlar bilan yozing.
+- Har bir inglizcha so'zdan keyin qavs ichida ruscha tarjimasini bering. Sayt, dastur va odam nomlari bundan mustasno.
+- Sozlash qadamlarini raqamlab yozing, tugma nomlarini rus tilida bering.
+- Pullik yoki ortga qaytarib bo'lmaydigan ishdan (o'chirish, nashr qilish, to'lov) oldin egasidan ruxsat so'rang.
+
+## Loyiha
+Qur'on o'quv ilovasi. Telefon uchun PWA, build (yig'ish) bosqichi yo'q: oddiy HTML, CSS va JS.
+- Sinov sayti (GitHub Pages): https://mirzajonov8144-del.github.io/kitab/ — `claude/project-thread-8e57y8` branch'idan, "/ (root)" papkasidan.
+- PR #1: shu branch'dan `main` ga. Hali birlashtirilmagan.
+- Repo ochiq. Egasining qarori (2026-11-25): ish tugaguncha repo ochiq turishi mumkin. O'zbekiston musulmonlari idorasi ruxsati Google Play yoki ijtimoiy tarmoqlarga chiqarishdan OLDIN olinadi.
+
+## Fayllar
+| Fayl | Vazifasi |
+|---|---|
+| `index.html` | Qobiq: sarlavha, audio pleyer, pastki menyu |
+| `style.css` | Asosiy uslub va «Tungi oltin» mavzusi (eski Kisva): qora fon, oltin ramka, K6 (yorqin oltin) va K7 (metall oltin) |
+| `themes.css` | 4 iliq mavzu (`data-theme`): Samarqand (asosiy), Rishton, So'zana, Zardo'zi — milliy naqshlar. Qo'lda tahrirlamang: `python -I -X utf8 tools/build_themes.py themes.css` |
+| `app.js` | Butun mantiq: router (`#nom/arg`), ekranlar (`VIEWS`), hodisalar (`AFTER`), audio, sanalar, qibla, Lotin→Kirill |
+| `sw.js` | Oflayn kesh. Fayl o'zgarsa, `V` versiyasini oshiring |
+| `data/suras.json` | 114 sura: nomi (`uz` — o'zbekcha, QuranEnc), oyatlar soni, Makkiy/Madaniy |
+| `data/sura-names-uz.json` | O'zbekcha sura nomlarining manbasi, sanasi va ro'yxati |
+| `tools/build_sura_names.py` | `uz` nomlarini qo'shadi. `build_data.py` dan KEYIN ishga tushiring: `python -I -X utf8 tools/build_sura_names.py data` |
+| `data/s/NNN.json` | Har bir sura: `ar` (Tanzil), `uz`/`ru`/`en` tarjimalari va `*_fn` izohlari (QuranEnc) |
+| `data/zikr.json` | Tasbeh zikrlari: sunnah.com (Buxoriy) matni, HadeethEnc tarjimasi va solishtiruvi |
+| `data/zikr-uz-claude.json` | MANBA EMAS: manbada o'zbekchasi yo'q zikrlar uchun Claude tarjimasi (8-qoida). `build_zikr.py` uni `uz_claude` qilib qo'shadi |
+| `tools/build_zikr.py` | `data/zikr.json` ni manbalardan yig'adi: `python -I -X utf8 tools/build_zikr.py data` |
+| `data/tajvid.json` | Tajvid darslari: izoh (Claude, manba emas) va Tanzil'dan kesilgan misollar |
+| `tools/build_tajvid.py` | `data/tajvid.json` ni yig'adi va misollarni tekshiradi: `python -I -X utf8 tools/build_tajvid.py data` |
+| `data/duolar.json` | Qur'ondagi duolar: 2 guruh («Robbana», payg'ambarlar), oyat va tarjimalar `data/s/` dan o'zgarishsiz. Tanlov — Claude, manba emas |
+| `tools/build_duolar.py` | `data/duolar.json` ni yig'adi: faqat havolalar (sura:oyat) va tanlov mezoni, matn yo'q; mezonni dastur bilan tekshiradi: `python -I -X utf8 tools/build_duolar.py data` |
+| `data/TANZIL-LICENSE.txt` | Tanzil litsenziyasi. O'chirmang |
+| `tools/build_data.py` | `data/` ni manba fayllardan qayta yig'adi |
+| `tools/verify_arabic.py` | Tanzil va QuranEnc arabcha matnini harfma-harf solishtiradi |
+| `docs/tekshiruv-hisoboti.md` | Tekshiruv natijalari |
+
+Lokal ishga tushirish: `python3 -m http.server 8000`, keyin brauzerda http://localhost:8000.
+
+## TEMIR QOIDALAR (diniy matn)
+1. Oyat, tarjima, tafsir, duo, hadis yoki zikr matnini HECH QACHON xotiradan yozmang, hatto "qoralama" sifatida ham. Matn faqat manbadan, so'zma-so'z olinadi. Manba topilmasa, "manba topilmadi" deb to'xtang.
+2. Matnni o'zgartirmang: qisqartirmang, imloni tuzatmang. Ruxsatsiz kirill yozuvidan lotinga o'tkazmang: O'zbekcha tarjima kirillda qoladi, Lotin→Kirill konvertori (`toCyr`) faqat interfeys matni uchun.
+3. Har bir matn yonida manba bo'lsin: sayt, muallif yoki tarjimon, versiya, havola, olingan sana.
+4. Arabcha matnni ikkinchi manba bilan harfma-harf solishtiring. Farq chiqsa, "FARQ BOR" deb ikkala variantni yonma-yon ko'rsating va o'zingiz birini tanlamang.
+5. Hadis faqat to'plam nomi, raqami va darajasi bilan olinadi. Asosiy to'plam — Sahih al-Buxoriy.
+6. Payg'ambarlar hech qachon tasvirlanmaydi: rasm, AI-rasm, aktyor ham, ovoz bilan "o'ynatish" ham yo'q.
+7. Hamma diniy matn olim tekshiruvidan o'tguncha "Olim tekshiruvi kerak" holatida qoladi.
+8. Istisno (egasi qarori, 2026-11-25): manbada o'zbekcha tarjima bo'lmasa, Claude manbadagi ruscha yoki inglizcha matnni o'zbekchaga o'giradi. Xotiradan emas, faqat manbadagi matndan. Bunday tarjima alohida faylda saqlanadi (masalan, `data/zikr-uz-claude.json`) va ilovada "Manba emas" belgisi hamda qaysi matndan o'girilgani bilan ko'rsatiladi. Ilova bitgach, Idora tekshiradi. Arabcha matn, oyat, yangi duo va hadis bu istisnoga kirmaydi.
+9. Istisno (egasi qarori, 2026-11-25): tajvid qoidalarining izohini Claude yozadi ("Manba emas" belgisi bilan, Idora tekshiradi). Misollardagi Qur'on matni esa faqat `data/s/` dagi Tanzil matnidan kesib olinadi (`tools/build_tajvid.py`), qo'lda yozilmaydi.
+
+Ruxsat etilgan manbalar:
+- Asosiy: O'zbekiston musulmonlari idorasi (muslim.uz).
+- Solishtirish uchun: Tanzil (tanzil.net), Quran Foundation (api.quran.com), QuranEnc (quranenc.com), sunnah.com, HadeethEnc.
+- Boshqa sayt kerak bo'lsa, avval egasidan so'rang.
+
+## Hozirgi holat (2026-11-25)
+Ishlaydi:
+- 114 sura va 6236 oyat, 3 tilda tarjima va izohlar.
+- Oyatni alohida va butun surani ketma-ket tinglash, keyingi suraga o'tish, 9 qori (`verses.quran.foundation/<dir>/SSSAAA.mp3`).
+- Namoz vaqti: Aladhan, `method=99&methodSettings=15,null,15&school=1&tune=0,-3,-5,5,0,4,0,0,0`. Idora Fatvo markazining @fatvouz_taqvim_bot jadvaliga moslangan (egasi qarori, 2026-11-25): Namangan viloyatidagi bir nuqta, 25.11–01.12, 42/42 mos (formula nusxasi bilan). Aladhan Asr'ni ~0,3 daqiqa kech hisoblaydi, shuning uchun Asr ba'zan +1 daqiqa. Avvalgi sozlama (`0,-3,-4,5,-1,3,0,-1,0`) muslim.uz'dagi Toshkent vaqtiga mos edi; Idoraning ikki manbasi Quyosh/Shom/Xufton bo'yicha 1 daqiqa farq qiladi. Foydalanuvchi koordinatalari repoga yozilmaydi (repo ochiq).
+- Ramazon 1448 taqvimi (taxminiy), Qur'ondagi duolar (2026-11-26), tasbeh, qibla (kompas va GPS), sana (Umm al-Qura, ±1 tuzatish), arab harflari va ularning 4 shakli, sozlamalar, manbalar sahifasi.
+- Mavzular (egasi qarori, 2026-11-25): iliq marvarid fonda 4 milliy mavzu — Samarqand (asosiy), Rishton, So'zana, Zardo'zi; «Tungi oltin» (eski qora-oltin) ham Sozlamalar'da qoladi. Egasi so'rovi: Samarqand naqshi och (shaffofroq). Ko'rib chiqish uchun `index.html?theme=<kalit>` (saqlanmaydi).
+
+Qilinishi kerak (kamchiliklar):
+1. **Arabcha matn farqlari:** 355 oyatda Tanzil va QuranEnc arabcha matni farq qiladi (iqlob tanvini, kichik yo/vov, vaqf belgilari). Olim qaysi nashrni olishni aytishi kerak. Batafsil: `docs/tekshiruv-hisoboti.md`. 2026-11-25 topilgani: Idora nashriyoti Hilol-Nashr O'zbekistonda «Қуръони Карим – Мадина мусҳафи»ni chiqaradi (Hafs an Osim, rasm Abu Dovud bo'yicha, 6236 oyat; https://hilolnashr.uz/quroni-karim-kitoblari-uz/quroni-karim-dorul-gavsoniy-sariq-qogozda). QuranEnc'dagi arabcha matn ham Madina mushafi kodlashi, shuning uchun u O'zbekistondagi bosma mushafga yaqinroq. Yakuniy qaror — Idora/olim.
+2. **Makka/Madina jonli efiri (qisman bajarildi, 2026-11-25):** `LIVE` da Makka — @SaudiQuranTv (`UCos52azQNBgW63_9uDJoPDA`), Madina — @SaudiSunnahTv (`UCROKYPep-UuODNwyipe6JMw`). Ikkalasida YouTube tasdiq belgisi bor, tavsifida SBA'ga tegishli deyilgan. QOLDI: sba.sa saytidan havola tekshirilmadi (sayt bizdan ham, bulutdan ham ochilmadi). Makka kanali uchun `live_stream?channel=` embed'i ishlamadi, shuning uchun `LIVE[].video` (hozirgi efir ID'si) ishlatiladi: efir qayta boshlansa uni yangilang. 2026-11-25: Madina efiri (DLnqQHiDbaI) tugadi, kanal hozircha jonli emas; `live_stream?channel=` endi ikkala kanalda ham ishlamaydi. Pleyer xato bersa (onError), ilova "efir hozir yo'q" xabari va YouTube tugmasini ko'rsatadi (`liveWatch`). QOLDI: ID'ni avtomatik yangilash (masalan, GitHub Actions) — egasi ruxsati kerak.
+3. **Tajvid (qisman, 2026-11-25):** 7 dars (nun sokin va tanvin, mim sokin, g'unna, qalqala, madd, «al» lomi, «Alloh» lomi), 28 misol, Hafs rivoyati. Ma'lumot `data/tajvid.json`, uni `tools/build_tajvid.py` yig'adi: izohlar skript ichida (Claude yozgan, 9-qoida), misollar Tanzil matnidan kesiladi va qoidaga mosligi dastur bilan tekshiriladi (madd tabiiy/oriz bundan mustasno). QOLDI: Idora tekshiruvi; ro harfi (tafxim/tarqiq), vaqf belgilari darslari yo'q. muslim.uz'da tajvid darslari topilmadi. Idora nashriyoti Hilol-Nashr "Dorul Ma'rifa" tajvidli mushafini sotadi (https://hilolnashr.uz/quroni-karim-dorul-marifa) — ranglarni shunga moslash mumkin. Quran.com `text_uthmani_tajweed` matnidan foydalanmang: unda U+0670 o'rniga U+0672 turadi.
+4. **Tasbeh zikr matnlari (qisman, 2026-11-25):** 3 ta zikr qo'shildi: Buxoriy 843 (namozdan keyin 33 tadan), 6405 (100), 6403 (100). Ma'lumot `data/zikr.json`, uni `tools/build_zikr.py` yig'adi. Zikr iborasi sunnah.com'dagi hadis matnidan harfma-harf kesib olinadi. Uchala zikrda ham HadeethEnc bilan harakat farqi bor (masalan, «اللَّهِ» / «اللهِ»), ikkalasi "FARQ BOR" deb ko'rsatiladi. QOLDI: olim qaysi imloni olishni aytishi kerak. Manbada 6403 uchun o'zbekcha tarjima yo'q (faqat ruscha), 843 uchun faqat inglizcha bor. Ularni Claude o'zbekchaga o'girdi (8-qoida): `data/zikr-uz-claude.json`, `zikr.json` dagi `uz_claude` maydoni. Idora tekshiruvi kerak. Idora (muslim.uz) zikr manbasi topilmadi. Hammasi "Olim tekshiruvi kerak" holatida.
+5. **Namoz vaqtlari:** Fatvo boti bilan faqat bitta nuqtada (Namangan viloyati) 7 kun tekshirildi. Boshqa viloyatlar uchun ham botdan haftalik jadval olib tekshirish kerak (bot faqat Telegram'da joylashuv bo'yicha ishlaydi). Yozda (iyun) yana bir marta tekshiring. muslim.uz'da boshqa kun/hudud jadvali yo'q. Ramazon taqvimi chiqqach, uni Idoraning rasmiy taqvimi bilan almashtiring.
+6. **Sura nomlari (qisman, 2026-11-25):** o'zbekcha nomlar QuranEnc.com'ning o'zbekcha interfeysidan olindi (kirillda, o'zgartirilmagan) va `suras.json` ning `uz` maydoniga yozildi. muslim.uz'da ro'yxat yo'q (Qur'on sahifasi tanzil.net'ni ochadi), api.quran.com ochilmadi, shuning uchun ikkinchi manba yo'q. QOLDI: olim tekshiruvi. Manbaning o'zida 3 ta nom boshqa uslubda: 55 «ар-Раҳмон», 69 «ал-Ҳааққаҳ», 100 «вал-Одиёт» (qolganlarida «ал-» yo'q). Egasi qarori (2026-11-25): «ар-», «ал-», «вал-» manbadagidek qoladi, tuzatilmaydi.
+7. **Audio litsenziyasi (qisman, 2026-11-25):** egasi qarori: audio Quran Foundation'dan (verses.quran.com) qoladi. Ularning Developer Terms'i (https://api-docs.quran.foundation/legal/developer-terms/, 2026-11-20 yangilangan) verses.quran.com audiosini ham qamraydi: bepul, Google Play'da ham mumkin. Shartlar: Quran Foundation va qori nomini ko'rsatish (sura sahifasida va Manbalar'da bor); faylni o'z serverimizga yoki repoga ko'chirmaslik (rehost); audioni 1 haftadan ortiq saqlamaslik — `sw.js` audioni keshlamaydi, shunday qolsin; ilova ichiga audio joylamaslik. Oflayn yuklab olish faqat foydalanuvchi so'rasa va ilovaning yopiq xotirasida. API kaliti kerak emas (2026-11-25): Developer Terms ("Direct audio URLs") va FAQ ("Can I stream recitations directly...? Yes") bo'yicha quranicaudio.com, verses.quran.com, verses.quran.foundation, audio.qurancdn.com audiosi API'siz ham shu shartlar bilan ishlatiladi. Manzil almashtirildi (2026-11-25): O'zbekistondagi tarmoqda *.quran.com ochilmaydi (DNS javob bermaydi, quran.com nomi bilan ulanish uziladi), shuning uchun `AUDIO_BASE` = `verses.quran.foundation` (fayl yo'llari bir xil). `sw.js` *.quran.foundation va *.quran.com ni keshlamaydi. Developer akkaunt ochish ham shu sababli bo'lmadi: kirish (oauth2.quran.foundation) oauth2.quran.com'ga o'tadi. Boshqa manbalar (2026-11-25): alquran.cloud — faqat "shaxsiy va o'quv maqsadida"; everyayah.com va mp3quran.net — shartlar yo'q, yozma ruxsat kerak.
+8. **Tarjima versiyalari (bajarildi, 2026-11-25):** QuranEnc bosh sahifasidagi tarjimalar ro'yxatidan (https://quranenc.com/en/home#transes; `/api/v1/translations/list` da bu ikkisi yo'q): `uzbek_sadiq` — V1.0.1 (25.06.2025), `russian_rwwad` — V1.0.1 (29.03.2026), `english_saheeh` — 1.1.2. `data/s/` 2026-11-25 da yig'ilgan; 2-sura QuranEnc bilan 286/286 mos. QuranEnc shartlari ("Terms and Policies"): matnni o'zgartirmaslik, QuranEnc.com va versiyani ko'rsatish, xatoni QuranEnc'ga xabar qilish, eng so'nggi versiyaga yangilab turish, nomaqbul reklama yo'q. Vaqti-vaqti bilan shu ro'yxatdan versiyani tekshirib, o'zgarsa `build_data.py` ni qayta ishga tushiring.
+9. **Lotin yozuvidagi tarjima:** QuranEnc shartlari bo'yicha kirilldan lotinga o'zimiz o'girolmaymiz (o'zgartirish hisoblanadi). Yo'l topildi (2026-11-25): Quran Foundation'da shu tarjimaning tayyor lotin varianti bor — id 55 "Muhammad Sodiq Muhammad Yusuf (Latin)" (1:2 "Hamd olamlarning Robbi — Allohgadir."; kirill varianti id 127). QOLDI: Quran Foundation shartlari bu matnni ochiq repoga yoki ilova ichiga joylashni taqiqlaydi — faqat ilova ishlayotganda rasmiy API'dan olish mumkin. Rasmiy API Developer akkaunt va Client Credentials talab qiladi (kalitni ochiq PWA'ga qo'yib bo'lmaydi, kichik server kerak bo'lishi mumkin). Egasi akkaunt ochgach davom etiladi. 2026-11-25: akkaunt ochilmadi — Quran ID kirishi quran.com'da, u O'zbekistondagi tarmoqda ochilmaydi (egasi ham, Claude ham urindi). Ruxsat etilgan manbalarda lotin varianti yo'q: QuranEnc'dagi 3 o'zbekcha tarjima (`uzbek_sadiq`, `uzbek_rwwad`, `uzbek_mansour`) va Tanzil `uz.sodik` — hammasi kirillda. Hilol-Nashr va islom.uz (Shayx Muhammad Sodiq Muhammad Yusuf portali, quran.uz ham shunga kiradi) TAQIQLAYDI (2026-11-25 tekshirildi): hilolnashr.uz — "Барча ҳуқуқлар ҳимояланган"; islom.uz Фойдаланиш шартлари (6.10.2026 tahriri) 5.3 — kontentni parser/bot bilan ommaviy ko'chirish taqiqlangan, 7.3 — yozma roziliksiz elektron kitob/to'plam qilish, nashr etish va tarqatish taqiqlangan; 7.2 — faqat shaxsiy, ma'rifiy, notijoriy iqtibos, muallif, manba havolasi va Qo'mita ruxsat raqami bilan. Shuning uchun matn olinmadi. Yo'l: Islamic Portal MChJ'dan (admin@islom.uz, Telegram @portalislomuzadmin_bot) yoki QuranEnc'dan yozma ruxsat.
+10. **Duolar (qisman, 2026-11-26):** «Yana» → «Duolar». 2 guruh: «Robbana duolari» (20 duo, 28 oyat) va «Payg'ambarlar duolari» (27 duo, 42 oyat: Odam, Nuh, Ibrohim, Lut, Yusuf, Muso, Ayyub, Yunus, Zakariyo, Sulaymon, Iyso). Butun oyatlar, kesilmagan; har oyatni va butun duoni tinglash mumkin. Tayyor ro'yxat manbada topilmadi: muslim.uz'dagi «Қуръондаги дуолар шарҳи» maqolasi (https://muslim.uz/oz/e/post/46372-qur-ondagi-duolar-sharhi) bo'sh, sunnah.com Hisn al-Muslim'da Qur'on duolari bobi yo'q. Shuning uchun Claude mezon bo'yicha tanladi (ilovada "manba emas" deb yozilgan). Mezon (`tools/build_duolar.py` boshida batafsil): «Robbana» — oyatda «رَبَّنَا» bor, mo'minlar yoki farishtalar Allohdan biror narsa so'raydi; kofirlar, do'zax ahli, Qur'on qoralagan duolar va payg'ambarlar duolari kirmaydi. Payg'ambarlar — nomi aytilgan payg'ambar o'zi, oilasi yoki mo'minlar uchun so'raydi (yoki keyingi oyat "ijobat qildik" deydi); payg'ambar nomi shu oyat yoki 6 oyatgacha oldingi oyat tarjimasida/izohida bo'lishi dastur bilan tekshiriladi (Yunus — 21:87 izohida «Зуннун — Юнус»). Kirmagan: odamlarga qarshi duolar (10:88, 71:26), «ayt» deb o'rgatilganlar (23:29, 20:114), nom uzoqda bo'lganlar (26:83-87, 37:100). QOLDI: olim tanlovni va mezonni tekshirishi kerak; Idora ro'yxati topilsa, shunga almashtiring.
+11. **Kelajakda:** Hadislar bo'limi (HadeethEnc, Buxoriy raqamlari sunnah.com'da tekshiriladi), payg'ambarlar bo'limi (rejaga qarang), Google Play uchun TWA yoki Capacitor.
+
+## Ishlash tartibi
+- Har bir o'zgarishdan keyin 390px kenglikdagi telefon ekranida tekshiring: konsolda xato bo'lmasligi kerak.
+- Har bir bosqichni egasiga ko'rsating, keyin davom eting.
+- `sw.js` da `V` versiyasini oshirishni unutmang, aks holda telefonda eski versiya qoladi.
+
+## Havolalar
+- Ilova rejasi: https://claude.ai/artifact/1Vjb9pJoNvicvFHHJJYY18
+- Dizayn prototipi (K6/K7): https://claude.ai/artifact/6poFX6FTTQwYN2zvcnW471

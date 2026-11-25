@@ -1,0 +1,331 @@
+{
+ "status": "Manba emas — Idora tekshiruvi kerak",
+ "explanations": "Qoidalar izohini Claude (sun'iy intellekt) yozgan, egasi qarori bilan (2026-11-25). Idora tekshiradi.",
+ "examples_source": "Misollar ilovadagi Tanzil matnidan (Uthmani 1.1) harfma-harf kesib olingan. Qoidaga mosligi dastur bilan tekshirilgan (madd tabiiy va madd oriz misollari bundan mustasno).",
+ "riwaya": "Hafs an Osim",
+ "built": "2026-11-25",
+ "lessons": [
+  {
+   "id": "nun",
+   "title": "Nun sokin va tanvin",
+   "intro": "Sukunli nun (نْ) yoki tanvin (ـً ـٍ ـٌ) dan keyin qaysi harf kelishiga qarab, ular 4 xil o'qiladi.",
+   "rules": [
+    {
+     "name": "Izhor (aniq o'qish)",
+     "letters": "ء ه ع ح غ خ",
+     "text": "Keyin bo'g'iz harflari kelsa, nun yoki tanvin g'unnasiz, aniq o'qiladi.",
+     "ex": [
+      {
+       "ref": "1:7",
+       "ar": "أَنْعَمْتَ",
+       "check": "nun"
+      },
+      {
+       "ref": "2:62",
+       "ar": "مَنْ ءَامَنَ",
+       "check": "nun"
+      }
+     ]
+    },
+    {
+     "name": "Idg'om (qo'shib o'qish)",
+     "letters": "ي ن م و  ·  ل ر",
+     "text": "Keyin ي ن م و kelsa, nun keyingi harfga qo'shilib, g'unna bilan o'qiladi. Keyin ل yoki ر kelsa, g'unnasiz qo'shiladi. Nun va keyingi harf bir so'z ichida bo'lsa, idg'om qilinmaydi.",
+     "ex": [
+      {
+       "ref": "2:8",
+       "ar": "مَن يَقُولُ",
+       "check": "nun"
+      },
+      {
+       "ref": "2:5",
+       "ar": "مِّن رَّبِّهِمْ",
+       "check": "nun"
+      },
+      {
+       "ref": "2:2",
+       "ar": "هُدًى لِّلْمُتَّقِينَ",
+       "check": "nun"
+      }
+     ]
+    },
+    {
+     "name": "Iqlob (aylantirish)",
+     "letters": "ب",
+     "text": "Keyin ب kelsa, nun yoki tanvin م ga aylanib, g'unna bilan o'qiladi. Mushafda bu joyga kichik م belgisi qo'yiladi.",
+     "ex": [
+      {
+       "ref": "2:27",
+       "ar": "مِنۢ بَعْدِ",
+       "check": "nun"
+      },
+      {
+       "ref": "2:33",
+       "ar": "أَنۢبِئْهُم",
+       "check": "nun"
+      }
+     ]
+    },
+    {
+     "name": "Ixfo (yashirib o'qish)",
+     "letters": "ت ث ج د ذ ز س ش ص ض ط ظ ف ق ك",
+     "text": "Qolgan 15 harfdan biri kelsa, nun to'liq aytilmaydi: tovush burundan, g'unna bilan chiqadi.",
+     "ex": [
+      {
+       "ref": "2:4",
+       "ar": "مِن قَبْلِكَ",
+       "check": "nun"
+      },
+      {
+       "ref": "2:23",
+       "ar": "كُنتُمْ",
+       "check": "nun"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "mim",
+   "title": "Mim sokin",
+   "intro": "Sukunli mim (مْ) dan keyin keladigan harfga qarab 3 xil o'qiladi.",
+   "rules": [
+    {
+     "name": "Ixfo shafaviy",
+     "letters": "ب",
+     "text": "Keyin ب kelsa, mim lablar yengil tegib, g'unna bilan o'qiladi.",
+     "ex": [
+      {
+       "ref": "105:4",
+       "ar": "تَرْمِيهِم بِحِجَارَةٍ",
+       "check": "mim"
+      }
+     ]
+    },
+    {
+     "name": "Idg'om misliy",
+     "letters": "م",
+     "text": "Keyin yana م kelsa, ikki mim qo'shilib, g'unna bilan o'qiladi.",
+     "ex": [
+      {
+       "ref": "2:10",
+       "ar": "قُلُوبِهِم مَّرَضٌ",
+       "check": "mim"
+      }
+     ]
+    },
+    {
+     "name": "Izhor shafaviy",
+     "letters": "",
+     "text": "ب va م dan boshqa harflar oldida mim aniq o'qiladi. Ayniqsa و va ف oldida mimni yashirib yubormaslik kerak.",
+     "ex": [
+      {
+       "ref": "1:7",
+       "ar": "عَلَيْهِمْ وَلَا",
+       "check": "mim"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "gunna",
+   "title": "G'unna (tashdidli nun va mim)",
+   "intro": "Tashdidli nun (نّ) va tashdidli mim (مّ) har doim to'liq g'unna bilan, taxminan 2 harakat cho'zib o'qiladi.",
+   "rules": [
+    {
+     "name": "Tashdidli nun va mim",
+     "letters": "نّ  مّ",
+     "text": "",
+     "ex": [
+      {
+       "ref": "2:20",
+       "ar": "إِنَّ ٱللَّهَ",
+       "check": "shadda"
+      },
+      {
+       "ref": "114:1",
+       "ar": "ٱلنَّاسِ",
+       "check": "shadda"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "qalqala",
+   "title": "Qalqala",
+   "intro": "ق ط ب ج د harflari sukunli bo'lsa, tovush biroz «sakrab» chiqadi. Shu harfda to'xtalganda qalqala kuchliroq bo'ladi.",
+   "rules": [
+    {
+     "name": "So'z ichida",
+     "letters": "ق ط ب ج د",
+     "text": "",
+     "ex": [
+      {
+       "ref": "2:27",
+       "ar": "وَيَقْطَعُونَ",
+       "check": "qalqala"
+      }
+     ]
+    },
+    {
+     "name": "To'xtalganda (vaqfda)",
+     "letters": "ق ط ب ج د",
+     "text": "",
+     "ex": [
+      {
+       "ref": "112:1",
+       "ar": "أَحَدٌ",
+       "check": "qalqala"
+      },
+      {
+       "ref": "113:1",
+       "ar": "ٱلْفَلَقِ",
+       "check": "qalqala"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "madd",
+   "title": "Madd (cho'zish)",
+   "intro": "Madd harflari: harakatsiz ا (oldi fathali), و (oldi zammali), ي (oldi kasrali). Ular qancha cho'zilishi keyingi harfga bog'liq. «Harakat» — cho'zish o'lchovi.",
+   "rules": [
+    {
+     "name": "Madd tabiiy",
+     "letters": "ا و ي",
+     "text": "Keyin hamza yoki sukun kelmasa — 2 harakat.",
+     "ex": [
+      {
+       "ref": "1:4",
+       "ar": "مَٰلِكِ",
+       "check": "none"
+      }
+     ]
+    },
+    {
+     "name": "Madd muttasil (vojib)",
+     "letters": "",
+     "text": "Madd harfi va hamza bir so'zda — 4 yoki 5 harakat.",
+     "ex": [
+      {
+       "ref": "2:19",
+       "ar": "ٱلسَّمَآءِ",
+       "check": "madda"
+      }
+     ]
+    },
+    {
+     "name": "Madd munfasil (joiz)",
+     "letters": "",
+     "text": "Madd harfi so'z oxirida, hamza keyingi so'z boshida — 4 yoki 5 harakat (Hafs rivoyati, Shotibiy yo'li).",
+     "ex": [
+      {
+       "ref": "2:4",
+       "ar": "بِمَآ أُنزِلَ",
+       "check": "madda"
+      }
+     ]
+    },
+    {
+     "name": "Madd lozim",
+     "letters": "",
+     "text": "Madd harfidan keyin doimiy sukun yoki tashdid kelsa — 6 harakat. Ba'zi suralar boshidagi harflarda ham bor.",
+     "ex": [
+      {
+       "ref": "1:7",
+       "ar": "ٱلضَّآلِّينَ",
+       "check": "madda"
+      },
+      {
+       "ref": "2:1",
+       "ar": "الٓمٓ",
+       "check": "madda"
+      }
+     ]
+    },
+    {
+     "name": "Madd oriz (to'xtalganda)",
+     "letters": "",
+     "text": "Oyat oxirida to'xtalganda oxirgi harf sukunli bo'lib qoladi — 2, 4 yoki 6 harakat.",
+     "ex": [
+      {
+       "ref": "1:2",
+       "ar": "ٱلْعَٰلَمِينَ",
+       "check": "none"
+      },
+      {
+       "ref": "1:5",
+       "ar": "نَسْتَعِينُ",
+       "check": "none"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "lam",
+   "title": "«Al» dagi lom",
+   "intro": "So'z boshidagi «al» (ال) ning lomi keyingi harfga qarab 2 xil o'qiladi.",
+   "rules": [
+    {
+     "name": "Qamariy lom (o'qiladi)",
+     "letters": "ا ب غ ح ج ك و خ ف ع ق ي م ه",
+     "text": "Lom sukun bilan aniq o'qiladi.",
+     "ex": [
+      {
+       "ref": "91:2",
+       "ar": "وَٱلْقَمَرِ",
+       "check": "qamar"
+      }
+     ]
+    },
+    {
+     "name": "Shamsiy lom (o'qilmaydi)",
+     "letters": "ت ث د ذ ر ز س ش ص ض ط ظ ل ن",
+     "text": "Lom o'qilmaydi, keyingi harf tashdid bilan o'qiladi.",
+     "ex": [
+      {
+       "ref": "91:1",
+       "ar": "وَٱلشَّمْسِ",
+       "check": "shams"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "allah",
+   "title": "«Alloh» so'zidagi lom",
+   "intro": "«Alloh» so'zining lomi oldingi harfning harakatiga qarab o'qiladi.",
+   "rules": [
+    {
+     "name": "Qalin (tafxim)",
+     "letters": "",
+     "text": "Oldingi harf fatha yoki zammali bo'lsa, lom qalin o'qiladi.",
+     "ex": [
+      {
+       "ref": "112:1",
+       "ar": "هُوَ ٱللَّهُ",
+       "check": "allah"
+      }
+     ]
+    },
+    {
+     "name": "Ingichka (tarqiq)",
+     "letters": "",
+     "text": "Oldingi harf kasrali bo'lsa, lom ingichka o'qiladi.",
+     "ex": [
+      {
+       "ref": "1:1",
+       "ar": "بِسْمِ ٱللَّهِ",
+       "check": "allah"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
