@@ -1,6 +1,6 @@
 /* Oflayn ishlash: ilova fayllari va o'qilgan suralar keshda saqlanadi. Audio keshlanmaydi. */
-const V = "kitab-v13";
-const CORE = ["./", "index.html", "style.css", "themes.css", "app.js", "manifest.webmanifest", "icons/icon.svg", "data/suras.json", "data/s/001.json", "data/zikr.json", "data/tajvid.json"];
+const V = "kitab-v14";
+const CORE = ["./", "index.html", "style.css", "themes.css", "app.js", "manifest.webmanifest", "icons/icon.svg", "data/suras.json", "data/s/001.json", "data/zikr.json", "data/tajvid.json", "data/duolar.json"];
 self.addEventListener("install", e => e.waitUntil(caches.open(V).then(c => c.addAll(CORE)).then(() => self.skipWaiting())));
 self.addEventListener("activate", e => e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== V).map(k => caches.delete(k)))).then(() => self.clients.claim())));
 self.addEventListener("fetch", e => {

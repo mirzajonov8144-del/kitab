@@ -109,6 +109,8 @@ async function getJSON(url) { const r = await fetch(url); if (!r.ok) throw new E
 const sname = s => s.uz || s.lat;
 let zikrCache = null;
 async function loadZikr() { return zikrCache ||= await getJSON("data/zikr.json"); }
+let duoCache = null;
+async function loadDuolar() { return duoCache ||= await getJSON("data/duolar.json"); }
 async function loadSura(n) {
   if (!suraCache.has(n)) suraCache.set(n, await getJSON(`data/s/${String(n).padStart(3, "0")}.json`));
   return suraCache.get(n);
@@ -129,7 +131,7 @@ function dateLine(d = new Date()) {
 /* ---------- Audio ---------- */
 const audio = new Audio();
 audio.preload = "auto";
-const pl = { sura: 0, ayah: 0, total: 0, mode: "one", playing: false };
+const pl = { sura: 0, ayah: 0, total: 0, mode: "one", end: 0, playing: false };   // mode: one / all / range (duo: ayah..end)
 const pad3 = n => String(n).padStart(3, "0");
 const reciter = () => RECITERS.find(r => r.id === st.reciter) || RECITERS[0];
 const audioURL = (s, a) => `${AUDIO_BASE}${reciter().dir}${pad3(s)}${pad3(a)}.mp3`;
@@ -148,6 +150,7 @@ function playAyah(s, a, mode) {
   updPlayer();
 }
 audio.addEventListener("ended", () => {
+  if (pl.mode === "range" && pl.ayah < pl.end) return playAyah(pl.sura, pl.ayah + 1);
   if (pl.mode !== "all") { pl.playing = false; updPlayer(); markAyah(); return; }
   if (pl.ayah < pl.total) return playAyah(pl.sura, pl.ayah + 1);
   if (st.autoNext && pl.sura < 114) {
@@ -170,6 +173,7 @@ function stopAll() { audio.pause(); pl.sura = 0; updPlayer(); markAyah(); }
 function markAyah() {
   document.querySelectorAll(".ayah.on").forEach(e => e.classList.remove("on"));
   document.querySelectorAll(".ayah [data-play][aria-pressed=true]").forEach(b => { b.setAttribute("aria-pressed", "false"); b.textContent = "▶"; });
+  if (route.name === "duolar") return markDuo();
   if (route.name !== "sura" || route.arg !== pl.sura) return;
   const el = document.getElementById("a" + pl.ayah);
   if (!el) return;
@@ -203,6 +207,7 @@ const TABS = [
 ];
 const ICON = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
 const MORE = [
+  ["duolar", "Duolar", "Qur'ondagi duolar", '<path d="M8 21v-5L5 11l1.5-1.5L10 13"/><path d="M16 21v-5l3-5-1.5-1.5L14 13"/><path d="M12 3l1 2 2 .3-1.5 1.4.4 2.1L12 7.8 10.1 8.8l.4-2.1L9 5.3l2-.3z"/>'],
   ["ramazon", "Ramazon taqvimi", "Saharlik va iftorlik vaqtlari", '<path d="M15 3a9 9 0 1 0 6 15A7 7 0 0 1 15 3z"/>'],
   ["jonli", "Makka va Madina", "Jonli efir", '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M10 10l5 2.5-5 2.5z"/>'],
   ["tajvid", "Tajvid", "Qur'on o'qish qoidalari", '<path d="M4 19l4-14h8l4 14"/><path d="M7 13h10"/>'],
@@ -346,6 +351,27 @@ const VIEWS = {
           <div class="tj-exs">${r.ex.map(ex).join("")}</div></div>`).join("")}
       </details></div>`).join("")}`;
   },
+  /* Duolar: data/duolar.json (tools/build_duolar.py). Oyat va tarjimalar data/s/ dan o'zgarishsiz; tanlov — Claude, manba emas. */
+  async duolar() {
+    let d = null;
+    try { d = await loadDuolar(); } catch {}
+    if (!d) return `<div class="card"><h2>${T("Duolar")}</h2><p class="mut">${T("Duolarni yuklab bo'lmadi. Internetni tekshiring.")}</p></div>`;
+    const g = d.groups.find(x => x.key === store.get("dgroup", "")) || d.groups[0];
+    return `<div class="card"><h2>${T("Qur'ondagi duolar")}</h2>
+      <div class="note">${T("Olim tekshiruvi kerak.")} ${T("Oyatlar va tarjimalar manbadan o'zgarishsiz olingan. Lekin duolar ro'yxatini {Claude} (sun'iy intellekt) tanlagan — bu manba emas: {muslim.uz} va {sunnah.com}'da tayyor ro'yxat topilmadi.")}</div>
+      <details><summary class="mut">${T("Qaysi oyatlar olindi?")}</summary>
+        <p class="mut">${T("«Robbana duolari»: mo'minlar yoki farishtalar «Robbimiz» deb Allohdan biror narsa so'ragan oyatlar. Kofirlar va do'zax ahlining so'zlari olinmadi.")}</p>
+        <p class="mut">${T("«Payg'ambarlar duolari»: Qur'onda nomi aytilgan payg'ambar o'zi, oilasi yoki mo'minlar uchun Allohdan yaxshilik so'ragan oyatlar. Payg'ambarning nomi shu oyat, undan oldingi oyat yoki tarjima izohida ko'rinadi.")}</p>
+      </details>
+      <div class="row" style="justify-content:center"><div class="seg">${d.groups.map(x => `<button data-dgroup="${x.key}" aria-pressed="${x === g}">${T(x.title)}</button>`).join("")}</div></div>
+      <p class="mut" style="text-align:center">${g.items.length} ${T("duo")}</p></div>
+      ${g.items.map(duoCard).join("")}
+      <div class="card"><p class="src" style="margin-top:0;border:0;padding:0">${T("Arabcha matn")}: <a href="https://tanzil.net" target="_blank" rel="noopener">Tanzil Project</a> (Uthmani 1.1, CC BY 3.0).
+        ${st.tr !== "none" ? `${T("Tarjima")}: ${trCredit()} — <a href="https://quranenc.com" target="_blank" rel="noopener">QuranEnc.com</a>.` : ""}
+        ${T("Olingan")}: ${esc(d.sources.retrieved)}.
+        ${T("Audio")}: ${T("qori")} ${esc(reciter().name)} — <a href="https://quran.foundation" target="_blank" rel="noopener">Quran Foundation</a> (verses.quran.foundation).
+        ${T("Duolar tanlovi")}: Claude, ${T("manba emas")}. <br>${T("Holat: olim tekshiruvi kutilmoqda.")}</p></div>`;
+  },
   async harflar() {
     return `<div class="card"><p class="mut">${T("Harfga bosing — uning so'z boshida, o'rtasida va oxiridagi shakli chiqadi.")}</p>
     <div id="lform"></div><div class="letters">${LETTERS.map(([c, n], i) => `<button data-letter="${i}"><span class="l">${c}</span><small>${T(n)}</small></button>`).join("")}</div></div>`;
@@ -381,6 +407,7 @@ const VIEWS = {
     <li>${T("Namoz vaqtlari")}: Aladhan API (${T("taxminiy")}), ${T("Idora Fatvo markazining taqvim botiga moslangan")}; ${T("rasmiy")}: <a href="https://t.me/fatvouz_taqvim_bot" target="_blank" rel="noopener">@fatvouz_taqvim_bot</a>, <a href="https://muslim.uz" target="_blank" rel="noopener">muslim.uz</a>.</li>
     <li>${T("Sura nomlari (o'zbekcha)")}: <a href="https://quranenc.com/uz/browse/uzbek_sadiq/1" target="_blank" rel="noopener">QuranEnc.com</a> — ${T("o'zgartirilmagan, kirillda. Olim tekshiruvi kerak.")}</li>
     <li>${T("Tasbeh zikrlari")}: <a href="https://sunnah.com/bukhari" target="_blank" rel="noopener">sunnah.com</a> — Sahih al-Bukhari 843, 6403, 6405; ${T("tarjima va solishtirish")}: <a href="https://hadeethenc.com" target="_blank" rel="noopener">HadeethEnc</a>. ${T("843 va 6403 ning o'zbekcha tarjimasi manbada yo'q: ularni {Claude} (sun'iy intellekt) manbadagi inglizcha/ruscha matndan o'girgan, bu manba emas.")} ${T("Olim tekshiruvi kerak.")}</li>
+    <li>${T("Duolar")}: ${T("oyatlar va tarjimalar yuqoridagi manbalardan ({Tanzil}, {QuranEnc.com}) o'zgarishsiz olingan. Duolar ro'yxatini {Claude} (sun'iy intellekt) tanlagan, bu manba emas: {muslim.uz} va {sunnah.com} ({Hisn al-Muslim})da tayyor ro'yxat topilmadi.")} ${T("Olim tekshiruvi kerak.")}</li>
     <li>${T("Jonli efir")}: ${LIVE.map(l => `<a href="https://www.youtube.com/channel/${encodeURIComponent(l.channel)}" target="_blank" rel="noopener">${esc(l.handle)}</a>`).join(", ")} — ${T("Saudiya Radio va Televideniye idorasi ({SBA}), YouTube.")}</li></ul>
     <p class="mut">${T("Arabcha matn ikkinchi manba ({QuranEnc}) bilan 6236 oyat bo'yicha solishtirildi. Natija: {docs/tekshiruv-hisoboti.md}.")}</p>
     <div class="note">${T("Sinov versiyasi. O'zbekiston musulmonlari idorasi tasdiqlamaguncha ommaga chiqarilmaydi.")}</div></div>`;
@@ -417,6 +444,30 @@ function zikrCard(z, sel) {
       <p class="mut">${T("Hadisning to'liq arabcha matni")}:</p><p class="ar zk-full" dir="rtl" lang="ar">${esc(z.hadith_ar)}</p>
     </details>
   </div>`;
+}
+/* Duo kartasi: oyat va tarjima data/duolar.json dan, o'zgarishsiz. Diniy matn T() va toCyr dan o'tmaydi. */
+const TRLANG = { uz: "uz-Cyrl", ru: "ru", en: "en" };
+function duoCard(it) {
+  const tr = st.tr !== "none" ? st.tr : null, many = it.verses.length > 1;
+  const who = it.prophet ? `<b>${T(it.prophet)} ${T(it.prophet.includes(" va ") ? "alayhimassalom" : "alayhissalom")}</b><br>` : "";
+  const range = `${it.s}:${it.from}:${it.to}`;
+  return `<div class="card duo"><div class="arow"><span class="mut">${who}<a href="#sura/${it.s}" data-open="${it.s}" data-ayah="${it.from}"><b lang="${SURAS[it.s - 1].uz ? "uz-Cyrl" : "en"}">${esc(sname(SURAS[it.s - 1]))}</b> ${esc(it.ref)}</a></span><span class="sp"></span>
+    ${many ? `<button class="ib" data-pr="${range}" aria-pressed="false">${T("▶ Duoni tinglash")}</button>` : ""}</div>
+    ${it.verses.map(v => `<div class="ayah"><div class="arow"><span class="num">${v.a}</span><span class="sp"></span>
+      <button class="ib" data-pa="${it.s}:${v.a}" aria-pressed="false" aria-label="${T("Oyatni tinglash")} ${it.s}:${v.a}">▶</button></div>
+      <p class="ar" dir="rtl" lang="ar">${esc(v.ar)}</p>${tr ? `<div class="tr" lang="${TRLANG[tr]}">${esc(v[tr])}</div>` : ""}${tr && st.fn && v[tr + "_fn"] ? `<div class="fn" lang="${TRLANG[tr]}">${esc(v[tr + "_fn"])}</div>` : ""}</div>`).join("")}
+    ${it.prophet ? `<p class="src">${T("Payg'ambar nomi")}: ${esc(it.name_at)} ${T("oyat tarjimasida (yoki izohida) aytilgan.")}</p>` : ""}</div>`;
+}
+/* Duolar ekranida o'qilayotgan oyat va duo tugmasini belgilash. */
+function markDuo() {
+  document.querySelectorAll("[data-pa][aria-pressed=true]").forEach(b => { b.setAttribute("aria-pressed", "false"); b.textContent = "▶"; });
+  document.querySelectorAll("[data-pr][aria-pressed=true]").forEach(b => { b.setAttribute("aria-pressed", "false"); b.textContent = T("▶ Duoni tinglash"); });
+  if (!pl.sura || !pl.playing) return;
+  const b = document.querySelector(`[data-pa="${pl.sura}:${pl.ayah}"]`);
+  if (b) { b.setAttribute("aria-pressed", "true"); b.textContent = "❚❚"; b.closest(".ayah").classList.add("on"); }
+  if (pl.mode !== "range") return;
+  const r = [...document.querySelectorAll("[data-pr]")].find(x => { const [s, a, e] = x.dataset.pr.split(":").map(Number); return s === pl.sura && a <= pl.ayah && pl.ayah <= e; });
+  if (r) { r.setAttribute("aria-pressed", "true"); r.textContent = T("❚❚ To'xtatish"); }
 }
 function trCredit() { return { uz: T("Shayx Muhammad Sodiq Muhammad Yusuf ({uzbek_sadiq, V1.0.1})"), ru: "Rowwad (russian_rwwad, V1.0.1)", en: "Saheeh International (english_saheeh 1.1.2)" }[st.tr] || ""; }
 function regionOpts() { return Object.entries(REGIONS).map(([k, r]) => `<option value="${k}" ${k === st.region ? "selected" : ""}>${T(r[0])}</option>`).join(""); }
@@ -466,6 +517,10 @@ function liveWatch() {
 
 const AFTER = {
   jonli() { liveWatch(); },
+  duolar() {
+    document.querySelectorAll("[data-dgroup]").forEach(b => b.onclick = () => { store.set("dgroup", b.dataset.dgroup); render(); });
+    markDuo();
+  },
   quran() { $("#q").addEventListener("input", e => { $("#slist").innerHTML = suraItems(e.target.value); }); },
   sura() {
     if (st.last && st.last.s === route.arg && st.last.a > 1 && pendingAyah === null) pendingAyah = st.last.a;
@@ -559,10 +614,20 @@ let pendingAyah = null;
 
 /* ---------- Umumiy bosishlar ---------- */
 document.addEventListener("click", e => {
-  const t = e.target.closest("button"); if (!t) return;
+  const t = e.target.closest("button, a[data-open]"); if (!t) return;
   if (t.dataset.tab) return go(t.dataset.tab);
   if (t.dataset.go) return go(t.dataset.go);
-  if (t.dataset.open) { pendingAyah = t.dataset.ayah ? +t.dataset.ayah : 0; return go("sura", +t.dataset.open); }
+  if (t.dataset.open) { e.preventDefault(); pendingAyah = t.dataset.ayah ? +t.dataset.ayah : 0; return go("sura", +t.dataset.open); }
+  if (t.dataset.pa) {
+    const [s, a] = t.dataset.pa.split(":").map(Number);
+    if (pl.sura === s && pl.ayah === a && pl.playing) return audio.pause();
+    return playAyah(s, a, "one");
+  }
+  if (t.dataset.pr) {
+    const [s, a, b] = t.dataset.pr.split(":").map(Number);
+    if (pl.mode === "range" && pl.playing && pl.sura === s && a <= pl.ayah && pl.ayah <= b) return audio.pause();
+    pl.end = b; return playAyah(s, a, "range");
+  }
   if (t.dataset.play) {
     const a = +t.dataset.play;
     if (pl.sura === route.arg && pl.ayah === a && pl.playing) return audio.pause();
