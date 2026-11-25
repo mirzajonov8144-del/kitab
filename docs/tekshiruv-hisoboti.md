@@ -63,5 +63,5 @@ Men ulardan birini "to'g'ri" deb tanlamadim. Ilovada Tanzil matni o'zgarishsiz k
   Ziddiyat: yangi tuzatishlar bilan Toshkent 25.11 Quyosh/Shom/Xufton 07:17/17:01/18:18 bo'ladi, muslim.uz sahifasi esa 07:18/17:00/18:17 ko'rsatadi — Idoraning ikki manbasi 1 daqiqa farq qiladi. Egasi qarori: Fatvo botiga moslash.
 - **Hijriy sana:** Umm al-Qura bo'yicha 2026-11-25 = 15 Jumodul oxir 1448; muslim.uz ham "15 Жумадул сони, 1448" ko'rsatdi — mos.
 - **Quran.com tajvid matni** ishlatilmadi: unda dagger-alif (U+0670) o'rniga U+0672 kodi bor (masalan 1:6), bu boshqa harf sifatida ko'rinishi mumkin.
-- **Tarjimalar:** QuranEnc javobidan so'zma-so'z olindi, kirill yozuvida qoldirildi. Versiya: uzbek_sadiq va russian_rwwad — "versiya aniqlanmadi" (ro'yxat API'da yo'q); english_saheeh 1.1.2.
+- **Tarjimalar:** QuranEnc javobidan so'zma-so'z olindi, kirill yozuvida qoldirildi. Versiya: uzbek_sadiq V1.0.1 (25.06.2025), russian_rwwad V1.0.1 (29.03.2026) — QuranEnc bosh sahifasidagi ro'yxatdan, 2026-11-25 (API ro'yxatida yo'q); english_saheeh 1.1.2. 2026-11-25: 2-sura (286 oyat) ruscha va o'zbekcha tarjimasi QuranEnc API bilan to'liq mos.
 - **Audio:** verses.quran.com (Quran Foundation). Litsenziya shartlari ishga tushirishdan oldin rasmiy API kaliti bilan tasdiqlanishi kerak.

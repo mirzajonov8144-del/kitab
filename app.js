@@ -349,9 +349,10 @@ const VIEWS = {
   async manbalar() {
     return `<div class="card"><h2>${T("Manbalar")}</h2><ul>
     <li>${T("Arabcha matn")}: <a href="https://tanzil.net" target="_blank" rel="noopener">Tanzil Project</a> — Uthmani, ${T("versiya")} 1.1, CC BY 3.0. ${T("Matn o'zgartirilmagan.")}</li>
-    <li>${T("O'zbekcha tarjima")}: QuranEnc.com — uzbek_sadiq (${T("versiya aniqlanmadi")}).</li>
-    <li>${T("Ruscha tarjima")}: QuranEnc.com — russian_rwwad (${T("versiya aniqlanmadi")}).</li>
+    <li>${T("O'zbekcha tarjima")}: QuranEnc.com — uzbek_sadiq, ${T("versiya")} V1.0.1 (25.06.2025).</li>
+    <li>${T("Ruscha tarjima")}: QuranEnc.com — russian_rwwad, ${T("versiya")} V1.0.1 (29.03.2026).</li>
     <li>${T("Inglizcha tarjima")}: QuranEnc.com — english_saheeh, ${T("versiya")} 1.1.2.</li>
+    <li>${T("Tarjimalar")} <a href="https://quranenc.com/en/home#transes" target="_blank" rel="noopener">QuranEnc.com</a> ${T("shartlari bo'yicha o'zgartirilmasdan beriladi. Xato topsangiz, {QuranEnc.com}'ga xabar bering.")}</li>
     <li>${T("Audio")}: <a href="https://quran.foundation" target="_blank" rel="noopener">Quran Foundation</a> (verses.quran.com), ${T("qorilar")}: ${RECITERS.map(r => esc(r.name)).join(", ")}. ${T("Audio ularning saytidan eshittiriladi, ilovada saqlanmaydi")} (<a href="https://api-docs.quran.foundation/legal/developer-terms/" target="_blank" rel="noopener">${T("shartlar")}</a>).</li>
     <li>${T("Namoz vaqtlari")}: Aladhan API (${T("taxminiy")}), ${T("Idora Fatvo markazining taqvim botiga moslangan")}; ${T("rasmiy")}: <a href="https://t.me/fatvouz_taqvim_bot" target="_blank" rel="noopener">@fatvouz_taqvim_bot</a>, <a href="https://muslim.uz" target="_blank" rel="noopener">muslim.uz</a>.</li>
     <li>${T("Sura nomlari (o'zbekcha)")}: <a href="https://quranenc.com/uz/browse/uzbek_sadiq/1" target="_blank" rel="noopener">QuranEnc.com</a> — ${T("o'zgartirilmagan, kirillda. Olim tekshiruvi kerak.")}</li>
@@ -393,7 +394,7 @@ function zikrCard(z, sel) {
     </details>
   </div>`;
 }
-function trCredit() { return { uz: T("Shayx Muhammad Sodiq Muhammad Yusuf ({uzbek_sadiq})"), ru: "Rowwad (russian_rwwad)", en: "Saheeh International (english_saheeh 1.1.2)" }[st.tr] || ""; }
+function trCredit() { return { uz: T("Shayx Muhammad Sodiq Muhammad Yusuf ({uzbek_sadiq, V1.0.1})"), ru: "Rowwad (russian_rwwad, V1.0.1)", en: "Saheeh International (english_saheeh 1.1.2)" }[st.tr] || ""; }
 function regionOpts() { return Object.entries(REGIONS).map(([k, r]) => `<option value="${k}" ${k === st.region ? "selected" : ""}>${T(r[0])}</option>`).join(""); }
 function suraItems(q) {
   q = q.trim().toLowerCase();
