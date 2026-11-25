@@ -84,7 +84,10 @@ const MAKKAH = [21.4225, 39.8262];
    sba.sa saytidagi havola hali tekshirilmadi (sayt ochilmadi).
    `video` — kanalning hozirgi jonli efiri (2026-11-25). Makka kanali uchun `live_stream?channel=` embed'i
    "Video mavjud emas" ko'rsatdi, shuning uchun aniq video ID birinchi ishlatiladi. Efir qayta boshlansa ID
-   o'zgaradi: unda youtube.com/channel/<channel>/live dan yangi ID'ni olib yozing. */
+   o'zgaradi: unda youtube.com/channel/<channel>/live dan yangi ID'ni olib yozing.
+   2026-11-25: Madina efiri (DLnqQHiDbaI) 13:52 UTC da tugadi, kanal hozircha jonli emas; `live_stream?channel=`
+   ikkala kanalda ham "Видео недоступно" beradi. Shuning uchun pleyer xato bersa (onError, masalan 150),
+   ilova video o'rniga "efir hozir yo'q" xabari va YouTube tugmasini ko'rsatadi (liveWatch). */
 const LIVE = [
   { key: "makka", title: "Makka — Masjidul Harom", channel: "UCos52azQNBgW63_9uDJoPDA", video: "IsJTAdC3-Jw", name: "قناة القرآن الكريم", handle: "@SaudiQuranTv" },
   { key: "madina", title: "Madina — Masjidun Nabaviy", channel: "UCROKYPep-UuODNwyipe6JMw", video: "DLnqQHiDbaI", name: "قناة السنة النبوية", handle: "@SaudiSunnahTv" }
@@ -321,7 +324,7 @@ const VIEWS = {
   },
   async jonli() {
     return LIVE.map(l => `<div class="card"><h2>${T(l.title)}</h2><div class="vid">${l.channel
-      ? `<iframe src="https://www.youtube-nocookie.com/embed/${l.video ? encodeURIComponent(l.video) : `live_stream?channel=${encodeURIComponent(l.channel)}`}" title="${esc(l.title)}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>`
+      ? `<iframe data-live="${esc(l.key)}" src="https://www.youtube-nocookie.com/embed/${l.video ? encodeURIComponent(l.video) : `live_stream?channel=${encodeURIComponent(l.channel)}`}?enablejsapi=1&origin=${encodeURIComponent(location.origin)}" title="${esc(l.title)}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`
       : `<span class="mut">${T("Rasmiy kanal hali tasdiqlanmadi. Saudiya rasmiy kanali ({SBA}) aniqlangach shu yerda jonli efir ochiladi.")}</span>`}</div>${l.channel
       ? `<p class="mut">${T("Manba")}: <a href="https://www.youtube.com/channel/${encodeURIComponent(l.channel)}" target="_blank" rel="noopener">${esc(l.name)} (${esc(l.handle)})</a> — ${T("Saudiya Radio va Televideniye idorasi ({SBA}) rasmiy kanali.")}<br>${T("Video ochilmasa")}: <a href="https://www.youtube.com/channel/${encodeURIComponent(l.channel)}/live" target="_blank" rel="noopener">${T("{YouTube}'da ochish")}</a></p>` : ""}</div>`).join("");
   },
@@ -442,7 +445,27 @@ async function prayerFor(dateStr) {
 }
 const ddmmyyyy = d => `${String(d.getDate()).padStart(2, "0")}-${String(d.getMonth() + 1).padStart(2, "0")}-${d.getFullYear()}`;
 
+/* Jonli efir: YouTube pleyeri xato bersa (efir tugagan yoki ID eskirgan), video o'rniga tushunarli xabar. */
+function liveOffline(key) {
+  const l = LIVE.find(x => x.key === key), box = document.querySelector(`iframe[data-live="${key}"]`)?.parentElement;
+  if (!l || !box) return;
+  box.classList.add("off");
+  box.innerHTML = `<div><p>${T("Bu kanalda hozir jonli efir yo'q yoki efir manzili o'zgargan.")}</p><a class="btn" href="https://www.youtube.com/channel/${encodeURIComponent(l.channel)}/live" target="_blank" rel="noopener">▶ ${T("{YouTube}'da ochish")}</a></div>`;
+}
+addEventListener("message", e => {
+  if (!/^https:\/\/www\.youtube(-nocookie)?\.com$/.test(e.origin) || typeof e.data !== "string") return;
+  let d; try { d = JSON.parse(e.data); } catch { return; }
+  if (d && d.event === "onError" && LIVE.some(l => l.key === d.id)) liveOffline(d.id);
+});
+function liveWatch() {
+  document.querySelectorAll("iframe[data-live]").forEach(f => {
+    const ping = () => f.contentWindow && f.contentWindow.postMessage(JSON.stringify({ event: "listening", id: f.dataset.live, channel: "widget" }), "*");
+    f.addEventListener("load", () => { ping(); setTimeout(ping, 700); setTimeout(ping, 2000); });
+  });
+}
+
 const AFTER = {
+  jonli() { liveWatch(); },
   quran() { $("#q").addEventListener("input", e => { $("#slist").innerHTML = suraItems(e.target.value); }); },
   sura() {
     if (st.last && st.last.s === route.arg && st.last.a > 1 && pendingAyah === null) pendingAyah = st.last.a;

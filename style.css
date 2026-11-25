@@ -124,3 +124,6 @@ table.tt tr.today td{background:rgb(255 215 106/.1);color:var(--goldb);font-weig
 .themes button{display:flex;align-items:center;gap:6px;background:none;border:1px solid var(--line);border-radius:999px;padding:6px 12px 6px 6px;font-size:13px;color:var(--ink)}
 .themes button i{width:18px;height:18px;border-radius:50%;box-shadow:inset 0 0 0 2px rgb(255 255 255/.5)}
 .themes button[aria-pressed=true]{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold);font-weight:700}
+.vid.off{background:var(--panel)}
+.vid.off p{margin:0 0 12px;color:var(--ink)}
+.vid.off .btn{display:inline-block;text-decoration:none}
