@@ -15,6 +15,7 @@ const st = {
   fn: store.get("fn", false),                // izohlarni ko'rsatish
   reciter: store.get("reciter", 7),
   style: store.get("style", "k6"),
+  theme: store.get("theme", "samarqand"),    // THEMES kaliti; "" = tungi oltin (eski qora-oltin)
   arsize: store.get("arsize", 28),
   hijriAdj: store.get("hijriAdj", 0),
   region: store.get("region", "toshkent"),
@@ -22,6 +23,10 @@ const st = {
   last: store.get("last", null)
 };
 const save = k => store.set(k, st[k]);
+/* Iliq mavzular (themes.css). ?theme=... faqat ko'rib chiqish uchun, saqlanmaydi. */
+const THEMES = [["samarqand", "Samarqand", "#0f6b6b"], ["rishton", "Rishton", "#1d4f91"], ["sozana", "So'zana", "#9a2c25"], ["zardozi", "Zardo'zi", "#6c1f36"], ["", "Tungi oltin", "#c9a24a"]];
+const QTHEME = new URLSearchParams(location.search).get("theme");
+if (QTHEME !== null && THEMES.some(t => t[0] === QTHEME)) st.theme = QTHEME;
 
 /* ---------- Lotin -> Kirill (faqat interfeys matni uchun; diniy matnga ishlatilmaydi) ---------- */
 function toCyr(s) {
@@ -223,6 +228,8 @@ function shell() {
   const active = route.name === "sura" ? "quran" : (TABS.some(t => t[0] === route.name) ? route.name : "yana");
   $("#nav").innerHTML = TABS.map(([k, l, i]) => `<button data-tab="${k}" ${k === active ? 'aria-current="page"' : ""}>${ICON(i)}<span>${T(l)}</span></button>`).join("");
   document.documentElement.dataset.style = st.style;
+  if (st.theme) document.documentElement.dataset.theme = st.theme; else delete document.documentElement.dataset.theme;
+  $('meta[name="theme-color"]').content = st.theme ? getComputedStyle(document.documentElement).getPropertyValue("--panel").trim() : "#070708";
   document.documentElement.style.setProperty("--arsize", st.arsize + "px");
   document.documentElement.lang = st.script === "kir" ? "uz-Cyrl" : "uz-Latn";
 }
@@ -355,7 +362,8 @@ const VIEWS = {
     <div class="row"><label><input type="checkbox" id="s-fn" ${st.fn ? "checked" : ""}> ${T("Tarjima izohlarini ko'rsatish")}</label></div>
     <div class="row"><label for="s-rec">${T("Qori")}</label><select id="s-rec">${RECITERS.map(r => `<option value="${r.id}" ${r.id === st.reciter ? "selected" : ""}>${esc(r.name)}</option>`).join("")}</select></div>
     <div class="row"><label for="s-size">${T("Arabcha shrift o'lchami")}</label><input type="range" id="s-size" min="22" max="44" value="${st.arsize}"></div>
-    <div class="row"><label>${T("Oyat rangi")}</label><div class="seg"><button data-style="k6" aria-pressed="${st.style === "k6"}">${T("Yorqin oltin")}</button><button data-style="k7" aria-pressed="${st.style === "k7"}">${T("Metall oltin")}</button></div></div>
+    <div class="row"><label>${T("Mavzu")}</label><div class="themes">${THEMES.map(([k, l, c]) => `<button data-theme-pick="${k}" aria-pressed="${st.theme === k}"><i style="background:${c}"></i>${T(l)}</button>`).join("")}</div></div>
+    <div class="row ${st.theme ? "hide" : ""}"><label>${T("Oyat rangi")}</label><div class="seg"><button data-style="k6" aria-pressed="${st.style === "k6"}">${T("Yorqin oltin")}</button><button data-style="k7" aria-pressed="${st.style === "k7"}">${T("Metall oltin")}</button></div></div>
     <p class="ar" style="--arsize:${st.arsize}px">${esc((await loadSura(1)).ar[1])}</p>
     <div class="note">${T("O'zbekcha tarjima manbada kirill yozuvida. Lotin yozuviga o'tkazish uchun tarjima egasining ruxsati kerak, shuning uchun u kirillda qoladi.")}</div></div>`;
   },
@@ -520,7 +528,8 @@ const AFTER = {
     $("#s-fn").onchange = e => { st.fn = e.target.checked; save("fn"); };
     $("#s-rec").onchange = e => { st.reciter = +e.target.value; save("reciter"); };
     $("#s-size").oninput = e => { st.arsize = +e.target.value; save("arsize"); document.documentElement.style.setProperty("--arsize", st.arsize + "px"); $(".card .ar").style.setProperty("--arsize", st.arsize + "px"); };
-    document.querySelectorAll("[data-style]").forEach(b => b.onclick = () => { st.style = b.dataset.style; save("style"); render(); });
+    document.querySelectorAll("[data-theme-pick]").forEach(b => b.onclick = () => { st.theme = b.dataset.themePick; save("theme"); render(); });
+    document.querySelectorAll("button[data-style]").forEach(b => b.onclick = () => { st.style = b.dataset.style; save("style"); render(); });
   }
 };
 let pendingAyah = null;

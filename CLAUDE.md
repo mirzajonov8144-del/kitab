@@ -16,7 +16,8 @@ Qur'on o'quv ilovasi. Telefon uchun PWA, build (yig'ish) bosqichi yo'q: oddiy HT
 | Fayl | Vazifasi |
 |---|---|
 | `index.html` | Qobiq: sarlavha, audio pleyer, pastki menyu |
-| `style.css` | Kisva uslubi: qora fon, oltin ramka, K6 (yorqin oltin) va K7 (metall oltin) |
+| `style.css` | Asosiy uslub va «Tungi oltin» mavzusi (eski Kisva): qora fon, oltin ramka, K6 (yorqin oltin) va K7 (metall oltin) |
+| `themes.css` | 4 iliq mavzu (`data-theme`): Samarqand (asosiy), Rishton, So'zana, Zardo'zi — milliy naqshlar. Qo'lda tahrirlamang: `python -I -X utf8 tools/build_themes.py themes.css` |
 | `app.js` | Butun mantiq: router (`#nom/arg`), ekranlar (`VIEWS`), hodisalar (`AFTER`), audio, sanalar, qibla, Lotin→Kirill |
 | `sw.js` | Oflayn kesh. Fayl o'zgarsa, `V` versiyasini oshiring |
 | `data/suras.json` | 114 sura: nomi (`uz` — o'zbekcha, QuranEnc), oyatlar soni, Makkiy/Madaniy |
@@ -57,6 +58,7 @@ Ishlaydi:
 - Oyatni alohida va butun surani ketma-ket tinglash, keyingi suraga o'tish, 9 qori (`verses.quran.foundation/<dir>/SSSAAA.mp3`).
 - Namoz vaqti: Aladhan, `method=99&methodSettings=15,null,15&school=1&tune=0,-3,-5,5,0,4,0,0,0`. Idora Fatvo markazining @fatvouz_taqvim_bot jadvaliga moslangan (egasi qarori, 2026-11-25): Namangan viloyatidagi bir nuqta, 25.11–01.12, 42/42 mos (formula nusxasi bilan). Aladhan Asr'ni ~0,3 daqiqa kech hisoblaydi, shuning uchun Asr ba'zan +1 daqiqa. Avvalgi sozlama (`0,-3,-4,5,-1,3,0,-1,0`) muslim.uz'dagi Toshkent vaqtiga mos edi; Idoraning ikki manbasi Quyosh/Shom/Xufton bo'yicha 1 daqiqa farq qiladi. Foydalanuvchi koordinatalari repoga yozilmaydi (repo ochiq).
 - Ramazon 1448 taqvimi (taxminiy), tasbeh, qibla (kompas va GPS), sana (Umm al-Qura, ±1 tuzatish), arab harflari va ularning 4 shakli, sozlamalar, manbalar sahifasi.
+- Mavzular (egasi qarori, 2026-11-25): iliq marvarid fonda 4 milliy mavzu — Samarqand (asosiy), Rishton, So'zana, Zardo'zi; «Tungi oltin» (eski qora-oltin) ham Sozlamalar'da qoladi. Egasi so'rovi: Samarqand naqshi och (shaffofroq). Ko'rib chiqish uchun `index.html?theme=<kalit>` (saqlanmaydi).
 
 Qilinishi kerak (kamchiliklar):
 1. **Arabcha matn farqlari:** 355 oyatda Tanzil va QuranEnc arabcha matni farq qiladi (iqlob tanvini, kichik yo/vov, vaqf belgilari). Olim qaysi nashrni olishni aytishi kerak. Batafsil: `docs/tekshiruv-hisoboti.md`. 2026-11-25 topilgani: Idora nashriyoti Hilol-Nashr O'zbekistonda «Қуръони Карим – Мадина мусҳафи»ni chiqaradi (Hafs an Osim, rasm Abu Dovud bo'yicha, 6236 oyat; https://hilolnashr.uz/quroni-karim-kitoblari-uz/quroni-karim-dorul-gavsoniy-sariq-qogozda). QuranEnc'dagi arabcha matn ham Madina mushafi kodlashi, shuning uchun u O'zbekistondagi bosma mushafga yaqinroq. Yakuniy qaror — Idora/olim.
