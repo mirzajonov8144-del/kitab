@@ -5,6 +5,8 @@
 - Uzbek / Russian translations and a second Arabic text come from HadeethEnc (hadeethenc.com) API.
 - The phrase is compared letter by letter with the same phrase in HadeethEnc. Any difference -> "farq": true,
   both variants are stored and shown side by side; neither is chosen.
+- Exception (owner's decision, 2026-11-25): where no Uzbek translation exists in the source, data/zikr-uz-claude.json
+  holds Claude's translation of the source's ru/en text. It is stored apart ("uz_claude") and shown as "not a source".
 Usage: python -I -X utf8 tools/build_zikr.py <out_dir>    (out_dir = data)
 """
 import json, sys, re, html, urllib.request, urllib.error, datetime
@@ -64,6 +66,15 @@ def cut(text, key):
     while b < len(text) and MARKS.match(text[b]): b += 1   # keep the last letter's harakat
     return text[a:b]
 
+def merge_claude(recs, d):
+    """Attach data/zikr-uz-claude.json (Claude's Uzbek translation of the source ru/en text, NOT a source) as "uz_claude",
+    only where the source has no Uzbek translation. Kept in its own file so it is never mixed with source text."""
+    try: c = json.load(open(f"{d}/zikr-uz-claude.json", encoding="utf-8"))
+    except FileNotFoundError: return
+    for r in recs:
+        t = c["items"].get(r["id"])
+        r["uz_claude"] = None if r["uz"] or not t else {**t, "made_by": c["made_by"], "date": c["date"], "status": c["status"], "note": c["note"]}
+
 out = []
 for it in ITEMS:
     s = sunnah(it["ref"])
@@ -92,4 +103,5 @@ for it in ITEMS:
     out.append(rec)
     print(it["ref"], "phrases:", phrases, "| farq:", [c["farq"] for c in (rec["second"] or {}).get("compare", [])],
           "| uz:", bool(rec["uz"]), "ru:", bool(rec["ru"]))
+merge_claude(out, sys.argv[1])
 json.dump(out, open(f"{sys.argv[1]}/zikr.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)

@@ -97,6 +97,8 @@ const LETTERS = [
 let SURAS = [];
 const suraCache = new Map();
 async function getJSON(url) { const r = await fetch(url); if (!r.ok) throw new Error(r.status); return r.json(); }
+/* Sura nomi: o'zbekcha (QuranEnc, kirillda, T() dan o'tmaydi), bo'lmasa transliteratsiya. */
+const sname = s => s.uz || s.lat;
 let zikrCache = null;
 async function loadZikr() { return zikrCache ||= await getJSON("data/zikr.json"); }
 async function loadSura(n) {
@@ -133,7 +135,7 @@ function playAyah(s, a, mode) {
   if (a < meta.v) preload.src = audioURL(s, a + 1);
   markAyah();
   if ("mediaSession" in navigator) {
-    navigator.mediaSession.metadata = new MediaMetadata({ title: `${meta.lat} ${s}:${a}`, artist: reciter().name, album: "Kitab" });
+    navigator.mediaSession.metadata = new MediaMetadata({ title: `${sname(meta)} ${s}:${a}`, artist: reciter().name, album: "Kitab" });
   }
   updPlayer();
 }
@@ -174,7 +176,7 @@ function updPlayer(err) {
   if (!pl.sura) { p.classList.remove("show"); return; }
   p.classList.add("show");
   const m = SURAS[pl.sura - 1];
-  $("#ptitle").innerHTML = err ? T("Audio yuklanmadi (internetni tekshiring)") : `<b>${esc(m.lat)}</b> · ${pl.sura}:${pl.ayah} · ${esc(reciter().name)}`;
+  $("#ptitle").innerHTML = err ? T("Audio yuklanmadi (internetni tekshiring)") : `<b>${esc(sname(m))}</b> · ${pl.sura}:${pl.ayah} · ${esc(reciter().name)}`;
   $("#ptog").textContent = pl.playing ? "❚❚" : "▶";
   $("#ptog").setAttribute("aria-label", T(pl.playing ? "To'xtatish" : "Ijro etish"));
   const b = document.querySelector('[data-all]');
@@ -215,7 +217,7 @@ function parseHash() { const [n, a] = location.hash.slice(1).split("/"); return 
 function shell() {
   const top = TABS.some(t => t[0] === route.name);
   $("#back").classList.toggle("hide", top);
-  $("#title").textContent = route.name === "sura" ? `${route.arg}. ${SURAS[route.arg - 1].lat}` : T(TITLES[route.name] || "Kitab");
+  $("#title").textContent = route.name === "sura" ? `${route.arg}. ${sname(SURAS[route.arg - 1])}` : T(TITLES[route.name] || "Kitab");
   if (route.name === "quran") $("#title").textContent = "Kitab";
   $("#lat").setAttribute("aria-pressed", st.script === "lat"); $("#kir").setAttribute("aria-pressed", st.script === "kir");
   const active = route.name === "sura" ? "quran" : (TABS.some(t => t[0] === route.name) ? route.name : "yana");
@@ -239,7 +241,7 @@ const VIEWS = {
     const d = dateLine();
     const last = st.last ? SURAS[st.last.s - 1] : null;
     return `<div class="datebar"><span>${T(d.greg)}</span><b>${T(d.hijri)}</b></div>
-    ${last ? `<button class="btn2" style="width:100%;margin-bottom:12px" data-open="${st.last.s}" data-ayah="${st.last.a}">${T("Davom ettirish")}: ${esc(last.lat)} ${st.last.s}:${st.last.a}</button>` : ""}
+    ${last ? `<button class="btn2" style="width:100%;margin-bottom:12px" data-open="${st.last.s}" data-ayah="${st.last.a}">${T("Davom ettirish")}: ${esc(sname(last))} ${st.last.s}:${st.last.a}</button>` : ""}
     <input class="search" id="q" type="search" placeholder="${T("Sura nomi yoki raqami")}" aria-label="${T("Sura qidirish")}">
     <ul class="slist" id="slist">${suraItems("")}</ul>`;
   },
@@ -249,7 +251,7 @@ const VIEWS = {
     const tr = st.tr !== "none" ? d[st.tr] : null, fns = st.tr !== "none" ? d[st.tr + "_fn"] : null;
     const bism = n !== 1 && n !== 9 ? splitBasmala(d.ar[0], (await loadSura(1)).ar[0]) : null;
     const place = T(meta.place === "makkah" ? "Makkiy" : "Madaniy");
-    let h = `<div class="card sura"><div class="stitle"><h2>${esc(meta.ar)}</h2><div class="sub">${esc(meta.lat)} · ${place} · ${meta.v} ${T("oyat")}</div></div>
+    let h = `<div class="card sura"><div class="stitle"><h2>${esc(meta.ar)}</h2><div class="sub">${meta.uz ? `<b lang="uz-Cyrl">${esc(meta.uz)}</b> · ` : ""}${esc(meta.lat)} · ${place} · ${meta.v} ${T("oyat")}</div></div>
     <div class="row" style="justify-content:center"><button class="btn" data-all>${T("▶ Butun surani o'qish")}</button>
     <select id="rec" aria-label="${T("Qori")}">${RECITERS.map(r => `<option value="${r.id}" ${r.id === st.reciter ? "selected" : ""}>${esc(r.name)}</option>`).join("")}</select></div>
     <div class="row" style="justify-content:center"><label><input type="checkbox" id="autonext" ${st.autoNext ? "checked" : ""}> ${T("Keyingi suraga avtomatik o'tish")}</label></div>`;
@@ -262,9 +264,10 @@ const VIEWS = {
     });
     h += `<div class="src">${T("Arabcha matn")}: <a href="https://tanzil.net" target="_blank" rel="noopener">Tanzil Project</a> (Uthmani 1.1, CC BY 3.0).
       ${tr ? `${T("Tarjima")}: ${trCredit()} — <a href="https://quranenc.com" target="_blank" rel="noopener">QuranEnc.com</a>.` : ""}
-      ${T("Audio")}: Quran.com (Quran Foundation). <br>${T("Holat: olim tekshiruvi kutilmoqda.")}</div></div>
-      <div class="row" style="justify-content:space-between">${n > 1 ? `<button class="btn2" data-open="${n - 1}">← ${esc(SURAS[n - 2].lat)}</button>` : "<span></span>"}
-      ${n < 114 ? `<button class="btn2" data-open="${n + 1}">${esc(SURAS[n].lat)} →</button>` : ""}</div>`;
+      ${T("Audio")}: Quran.com (Quran Foundation).
+      ${meta.uz ? `${T("Sura nomi (o'zbekcha)")}: <a href="https://quranenc.com/uz/browse/uzbek_sadiq/${n}" target="_blank" rel="noopener">QuranEnc.com</a>.` : ""} <br>${T("Holat: olim tekshiruvi kutilmoqda.")}</div></div>
+      <div class="row" style="justify-content:space-between">${n > 1 ? `<button class="btn2" data-open="${n - 1}">← ${esc(sname(SURAS[n - 2]))}</button>` : "<span></span>"}
+      ${n < 114 ? `<button class="btn2" data-open="${n + 1}">${esc(sname(SURAS[n]))} →</button>` : ""}</div>`;
     return h;
   },
   async namoz() {
@@ -351,23 +354,30 @@ const VIEWS = {
     <li>${T("Inglizcha tarjima")}: QuranEnc.com — english_saheeh, ${T("versiya")} 1.1.2.</li>
     <li>${T("Audio")}: Quran.com / Quran Foundation (verses.quran.com).</li>
     <li>${T("Namoz vaqtlari")}: Aladhan API (${T("taxminiy")}), ${T("Idora Fatvo markazining taqvim botiga moslangan")}; ${T("rasmiy")}: <a href="https://t.me/fatvouz_taqvim_bot" target="_blank" rel="noopener">@fatvouz_taqvim_bot</a>, <a href="https://muslim.uz" target="_blank" rel="noopener">muslim.uz</a>.</li>
-    <li>${T("Tasbeh zikrlari")}: <a href="https://sunnah.com/bukhari" target="_blank" rel="noopener">sunnah.com</a> — Sahih al-Bukhari 843, 6403, 6405; ${T("tarjima va solishtirish")}: <a href="https://hadeethenc.com" target="_blank" rel="noopener">HadeethEnc</a>. ${T("Olim tekshiruvi kerak.")}</li>
+    <li>${T("Sura nomlari (o'zbekcha)")}: <a href="https://quranenc.com/uz/browse/uzbek_sadiq/1" target="_blank" rel="noopener">QuranEnc.com</a> — ${T("o'zgartirilmagan, kirillda. Olim tekshiruvi kerak.")}</li>
+    <li>${T("Tasbeh zikrlari")}: <a href="https://sunnah.com/bukhari" target="_blank" rel="noopener">sunnah.com</a> — Sahih al-Bukhari 843, 6403, 6405; ${T("tarjima va solishtirish")}: <a href="https://hadeethenc.com" target="_blank" rel="noopener">HadeethEnc</a>. ${T("843 va 6403 ning o'zbekcha tarjimasi manbada yo'q: ularni {Claude} (sun'iy intellekt) manbadagi inglizcha/ruscha matndan o'girgan, bu manba emas.")} ${T("Olim tekshiruvi kerak.")}</li>
     <li>${T("Jonli efir")}: ${LIVE.map(l => `<a href="https://www.youtube.com/channel/${encodeURIComponent(l.channel)}" target="_blank" rel="noopener">${esc(l.handle)}</a>`).join(", ")} — ${T("Saudiya Radio va Televideniye idorasi ({SBA}), YouTube.")}</li></ul>
     <p class="mut">${T("Arabcha matn ikkinchi manba ({QuranEnc}) bilan 6236 oyat bo'yicha solishtirildi. Natija: {docs/tekshiruv-hisoboti.md}.")}</p>
     <div class="note">${T("Sinov versiyasi. O'zbekiston musulmonlari idorasi tasdiqlamaguncha ommaga chiqarilmaydi.")}</div></div>`;
   }
 };
 
-/* Zikr kartasi: matnlar data/zikr.json dan (tools/build_zikr.py), bu yerda hech narsa yozilmaydi. Tarjimalar T() dan o'tmaydi. */
+/* Zikr kartasi: matnlar data/zikr.json dan (tools/build_zikr.py), bu yerda hech narsa yozilmaydi. Tarjimalar T() dan o'tmaydi.
+   uz_claude — manba emas: Claude'ning manbadagi ru/en matndan tarjimasi, alohida belgi bilan ko'rsatiladi. */
 function zikrCard(z, sel) {
   const num = z.source.url.split(":").pop(), on = sel?.id === z.id;
   const arP = s => `<span class="ar" dir="rtl" lang="ar">${esc(s)}</span>`;
   const farq = (z.second?.compare || []).filter(x => x.farq);
+  const cl = z.uz_claude;   // Claude tarjimasi (manba emas): data/zikr-uz-claude.json
+  const claude = cl ? `<div class="ai-tr"><b class="farq-badge">${T("Manba emas")}</b>
+      <p class="mut">${T("Manbada o'zbekcha tarjima yo'q. Bu tarjimani {Claude} (sun'iy intellekt) quyidagi " + (cl.from === "ru" ? "ruscha" : "inglizcha") + " matndan o'girgan. Idora tekshiruvi kerak.")}</p>
+      <p class="tr" lang="uz-Cyrl">${esc(cl.text)}</p>${cl.attribution ? `<p class="src" lang="uz-Cyrl">${esc(cl.attribution)}</p>` : ""}
+      <p class="src">${T("Qaysi matndan")}: ${esc(cl.from_source)}. ${T("Sana")}: ${esc(cl.date)}.</p></div>` : "";
   const tr = z.uz
     ? `<p class="tr" lang="uz-Cyrl">${esc(z.uz.text)}</p><p class="src">${T("Tarjima")}: <a href="${esc(z.uz.url)}" target="_blank" rel="noopener">HadeethEnc</a> — ${esc(z.uz.attribution)}, ${esc(z.uz.grade)}. ${T("Olingan")}: ${esc(z.uz.retrieved)}.</p>`
-    : z.ru
+    : claude + (z.ru
       ? `<p class="mut">${T("O'zbekcha tarjima manbada topilmadi. Ruscha tarjima:")}</p><p class="tr" lang="ru">${esc(z.ru.text)}</p><p class="src">${T("Tarjima")}: <a href="${esc(z.ru.url)}" target="_blank" rel="noopener">HadeethEnc</a> — ${esc(z.ru.attribution)}, ${esc(z.ru.grade)}. ${T("Olingan")}: ${esc(z.ru.retrieved)}.</p>`
-      : `<p class="mut">${T("O'zbekcha va ruscha tarjima manbada topilmadi. Inglizcha tarjima ({sunnah.com}):")}</p><p class="tr" lang="en">${esc(z.en)}</p>`;
+      : `<p class="mut">${T("O'zbekcha va ruscha tarjima manbada topilmadi. Inglizcha tarjima ({sunnah.com}):")}</p><p class="tr" lang="en">${esc(z.en)}</p>`);
   return `<div class="zk${on ? " on" : ""}">
     <div class="zk-ph">${z.phrases.map(arP).join("")}</div>
     <div class="row"><b class="zk-n">× ${z.count}${z.phrases.length > 1 ? " " + T("(har biri)") : ""}</b>
@@ -387,8 +397,8 @@ function trCredit() { return { uz: T("Shayx Muhammad Sodiq Muhammad Yusuf ({uzbe
 function regionOpts() { return Object.entries(REGIONS).map(([k, r]) => `<option value="${k}" ${k === st.region ? "selected" : ""}>${T(r[0])}</option>`).join(""); }
 function suraItems(q) {
   q = q.trim().toLowerCase();
-  return SURAS.filter(s => !q || String(s.n) === q || s.lat.toLowerCase().includes(q) || s.ar.includes(q) || s.en.toLowerCase().includes(q))
-    .map(s => `<li><button data-open="${s.n}"><span class="num">${s.n}</span><span class="sname"><b>${esc(s.lat)}</b><small>${T(s.place === "makkah" ? "Makkiy" : "Madaniy")} · ${s.v} ${T("oyat")}</small></span><span class="sar">${esc(s.ar)}</span></button></li>`).join("");
+  return SURAS.filter(s => !q || String(s.n) === q || s.lat.toLowerCase().includes(q) || s.ar.includes(q) || s.en.toLowerCase().includes(q) || (s.uz || "").toLowerCase().includes(q) || (s.uz || "").toLowerCase().includes(toCyr(q).toLowerCase()))
+    .map(s => `<li><button data-open="${s.n}"><span class="num">${s.n}</span><span class="sname"><b lang="${s.uz ? "uz-Cyrl" : "en"}">${esc(sname(s))}</b><small>${s.uz ? esc(s.lat) + " · " : ""}${T(s.place === "makkah" ? "Makkiy" : "Madaniy")} · ${s.v} ${T("oyat")}</small></span><span class="sar">${esc(s.ar)}</span></button></li>`).join("");
 }
 /* Basmala faqat ko'rinishda alohida qatorga chiqariladi (Tanzil matni o'zgarmaydi):
    1-oyatning dastlabki 4 so'zi Fotiha 1-oyati bilan (shaddasiz) bir xil bo'lsa. */

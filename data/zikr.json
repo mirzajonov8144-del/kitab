@@ -46,7 +46,17 @@
     }
    ]
   },
-  "status": "Olim tekshiruvi kerak"
+  "status": "Olim tekshiruvi kerak",
+  "uz_claude": {
+   "from": "en",
+   "from_source": "sunnah.com, Sahih al-Bukhari 843, inglizcha tarjima",
+   "text": "Абу Ҳурайра ривоят қилади: Бир неча камбағал киши Пайғамбар (соллаллоҳу алайҳи васаллам) ҳузурларига келиб, дедилар: «Бойлар юксак даражаларга ва доимий неъматга эришадилар. Улар биз каби намоз ўқийдилар, биз каби рўза тутадилар. Уларнинг ортиқча моли бор, у билан ҳаж ва умра қиладилар, Аллоҳнинг йўлида курашадилар ва садақа берадилар». Пайғамбар дедилар: «Сизларга бир нарсани айтайми? Агар уни қилсангиз, сиздан ўзиб кетганларга етиб оласиз. Ҳеч ким сиздан ўзиб кета олмайди ва орасида яшаётган одамларингиздан яхшироқ бўласиз, худди шуни қилганлар бундан мустасно. Ҳар (фарз) намоздан кейин ўттиз уч мартадан \"Субҳаналлоҳ\", \"Алҳамдулиллаҳ\" ва \"Аллоҳу акбар\" денглар». Биз ўзаро ихтилоф қилдик. Баъзиларимиз: \"Субҳаналлоҳ\"ни ўттиз уч марта, \"Алҳамдулиллаҳ\"ни ўттиз уч марта ва \"Аллоҳу акбар\"ни ўттиз тўрт марта айтамиз, дедик. Мен Пайғамбар (соллаллоҳу алайҳи васаллам) ҳузурларига бордим, у зот дедилар: «\"Субҳаналлоҳ\", \"Алҳамдулиллаҳ\" ва \"Аллоҳу акбар\"ни ҳаммасини бирга [??] ўттиз уч мартадан айтинглар».",
+   "attribution": "[??] белгиси инглизча манбанинг ўзида бор.",
+   "made_by": "Claude (sun'iy intellekt) tarjimasi",
+   "date": "2026-11-25",
+   "status": "Idora tekshiruvi kerak",
+   "note": "Bu tarjimalar MANBA EMAS. Manbada o'zbekcha tarjima topilmagani uchun Claude (sun'iy intellekt) ularni manbadagi ruscha yoki inglizcha matndan o'girdi (egasi qarori, 2026-11-25). Xotiradan yozilmagan. Arabcha matn o'zgarmagan. Idora tekshirib, rasmiy tarjima bilan almashtiradi."
+  }
  },
  {
   "id": "tasbih100",
@@ -97,7 +107,8 @@
     }
    ]
   },
-  "status": "Olim tekshiruvi kerak"
+  "status": "Olim tekshiruvi kerak",
+  "uz_claude": null
  },
  {
   "id": "tahlil100",
@@ -141,6 +152,16 @@
     }
    ]
   },
-  "status": "Olim tekshiruvi kerak"
+  "status": "Olim tekshiruvi kerak",
+  "uz_claude": {
+   "from": "ru",
+   "from_source": "HadeethEnc #65905, ruscha tarjima",
+   "text": "Абу Ҳурайра (розияллоҳу анҳу)дан ривоят қилинади, Расулуллоҳ (соллаллоҳу алайҳи васаллам) айтдилар: «Ким бир кунда юз марта: \"Аллоҳдан ўзга илоҳ йўқ, У ягонадир, Унинг шериги йўқ. Мулк Уникидир, ҳамд Унгадир ва У ҳар бир нарсага қодирдир /Лаа илааҳа иллаллоҳу ваҳдаҳу лаа шарийка лаҳ, лаҳул мулку ва лаҳул ҳамду ва ҳува ъалаа кулли шайъин қодийр/\" деса, унга ўнта қулни озод қилганга тенг савоб ёзилади, унга юзта яхшилик ёзилади, ундан юзта гуноҳ ўчирилади ва бу унинг учун ўша куни кечгача шайтондан ҳимоя бўлади. Ҳеч ким бундан афзалроқ амал қила олмайди, фақат бу сўзларни ундан кўпроқ айтган киши бундан мустасно».",
+   "attribution": "Бухорий ва Муслим ривоят қилган",
+   "made_by": "Claude (sun'iy intellekt) tarjimasi",
+   "date": "2026-11-25",
+   "status": "Idora tekshiruvi kerak",
+   "note": "Bu tarjimalar MANBA EMAS. Manbada o'zbekcha tarjima topilmagani uchun Claude (sun'iy intellekt) ularni manbadagi ruscha yoki inglizcha matndan o'girdi (egasi qarori, 2026-11-25). Xotiradan yozilmagan. Arabcha matn o'zgarmagan. Idora tekshirib, rasmiy tarjima bilan almashtiradi."
+  }
  }
 ]
