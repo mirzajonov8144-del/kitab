@@ -48,7 +48,7 @@ Ruxsat etilgan manbalar:
 Ishlaydi:
 - 114 sura va 6236 oyat, 3 tilda tarjima va izohlar.
 - Oyatni alohida va butun surani ketma-ket tinglash, keyingi suraga o'tish, 9 qori (`verses.quran.com/<dir>/SSSAAA.mp3`).
-- Namoz vaqti: Aladhan, `method=99&methodSettings=15,null,15&school=1&tune=0,-3,-4,5,-1,3,0,-1,0`. 2026-11-25 kuni Toshkent bo'yicha Idora jadvali bilan aniq mos keldi.
+- Namoz vaqti: Aladhan, `method=99&methodSettings=15,null,15&school=1&tune=0,-3,-5,5,0,4,0,0,0`. Idora Fatvo markazining @fatvouz_taqvim_bot jadvaliga moslangan (egasi qarori, 2026-11-25): Namangan viloyatidagi bir nuqta, 25.11–01.12, 42/42 mos (formula nusxasi bilan). Aladhan Asr'ni ~0,3 daqiqa kech hisoblaydi, shuning uchun Asr ba'zan +1 daqiqa. Avvalgi sozlama (`0,-3,-4,5,-1,3,0,-1,0`) muslim.uz'dagi Toshkent vaqtiga mos edi; Idoraning ikki manbasi Quyosh/Shom/Xufton bo'yicha 1 daqiqa farq qiladi. Foydalanuvchi koordinatalari repoga yozilmaydi (repo ochiq).
 - Ramazon 1448 taqvimi (taxminiy), tasbeh, qibla (kompas va GPS), sana (Umm al-Qura, ±1 tuzatish), arab harflari va ularning 4 shakli, sozlamalar, manbalar sahifasi.
 
 Qilinishi kerak (kamchiliklar):
@@ -56,7 +56,7 @@ Qilinishi kerak (kamchiliklar):
 2. **Makka/Madina jonli efiri (qisman bajarildi, 2026-11-25):** `LIVE` da Makka — @SaudiQuranTv (`UCos52azQNBgW63_9uDJoPDA`), Madina — @SaudiSunnahTv (`UCROKYPep-UuODNwyipe6JMw`). Ikkalasida YouTube tasdiq belgisi bor, tavsifida SBA'ga tegishli deyilgan. QOLDI: sba.sa saytidan havola tekshirilmadi (sayt bizdan ham, bulutdan ham ochilmadi). Makka kanali uchun `live_stream?channel=` embed'i ishlamadi, shuning uchun `LIVE[].video` (hozirgi efir ID'si) ishlatiladi: efir qayta boshlansa uni yangilang.
 3. **Tajvid:** hozircha faqat bo'sh sahifa. Darslar Idora manbasidan olinadi. 2026-11-25: muslim.uz va old.muslim.uz'da tajvid darslari topilmadi, egasi manba berishi kerak. Quran.com `text_uthmani_tajweed` matnidan foydalanmang: unda U+0670 o'rniga U+0672 turadi.
 4. **Tasbeh zikr matnlari (qisman, 2026-11-25):** 3 ta zikr qo'shildi: Buxoriy 843 (namozdan keyin 33 tadan), 6405 (100), 6403 (100). Ma'lumot `data/zikr.json`, uni `tools/build_zikr.py` yig'adi. Zikr iborasi sunnah.com'dagi hadis matnidan harfma-harf kesib olinadi. Uchala zikrda ham HadeethEnc bilan harakat farqi bor (masalan, «اللَّهِ» / «اللهِ»), ikkalasi "FARQ BOR" deb ko'rsatiladi. QOLDI: olim qaysi imloni olishni aytishi kerak. 6403 uchun o'zbekcha tarjima yo'q (faqat ruscha), 843 uchun faqat inglizcha bor. Idora (muslim.uz) zikr manbasi topilmadi. Hammasi "Olim tekshiruvi kerak" holatida.
-5. **Namoz vaqtlari:** boshqa kunlar va hududlar Idora jadvali bilan tekshirilmagan. Ramazon taqvimi chiqqach, uni Idoraning rasmiy taqvimi bilan almashtiring.
+5. **Namoz vaqtlari:** Fatvo boti bilan faqat bitta nuqtada (Namangan viloyati) 7 kun tekshirildi. Boshqa viloyatlar uchun ham botdan haftalik jadval olib tekshirish kerak (bot faqat Telegram'da joylashuv bo'yicha ishlaydi). Yozda (iyun) yana bir marta tekshiring. muslim.uz'da boshqa kun/hudud jadvali yo'q. Ramazon taqvimi chiqqach, uni Idoraning rasmiy taqvimi bilan almashtiring.
 6. **Sura nomlari:** hozir faqat arabcha va Quran.com transliteratsiyasida. O'zbekcha nomlarni manbadan oling.
 7. **Audio litsenziyasi:** Google Play'dan oldin Quran Foundation API shartlarini tekshiring va API kaliti oling.
 8. **Tarjima versiyalari:** `uzbek_sadiq` va `russian_rwwad` versiyalari aniqlanmagan. QuranEnc'dan so'rang.

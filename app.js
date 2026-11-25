@@ -67,8 +67,12 @@ const REGIONS = {
   jizzax: ["Jizzax", 40.1158, 67.8422], guliston: ["Guliston", 40.4897, 68.7842], urganch: ["Urganch", 41.5506, 60.6317],
   nukus: ["Nukus", 42.4531, 59.6103]
 };
-/* Hisob: Fajr/Isha 15°, Asr — Hanafiy; Idora ({muslim.uz}) jadvaliga 2026-11-25 Toshkent bo'yicha moslashtirilgan. Taxminiy. */
-const PT_QS = "method=99&methodSettings=15,null,15&school=1&tune=0,-3,-4,5,-1,3,0,-1,0";
+/* Hisob: Fajr/Isha 15°, Asr — Hanafiy. Tuzatishlar (tune: Imsak,Fajr,Quyosh,Peshin,Asr,Shom,Sunset,Xufton,Midnight)
+   Idora Fatvo markazining @fatvouz_taqvim_bot jadvaliga moslangan (egasi qarori, 2026-11-25):
+   Namangan viloyatidagi bir nuqta, 25.11–01.12, 7 kun × 6 vaqt — formula 42/42 mos. Aladhan'ning Asr hisobi
+   ~0,3 daqiqa kechroq, shuning uchun Asr ba'zi kunlari botdan 1 daqiqa kech chiqishi mumkin.
+   Avvalgi sozlama (0,-3,-4,5,-1,3,0,-1,0) muslim.uz'dagi Toshkent vaqtiga mos edi; bot undan 1 daqiqa farq qiladi. Taxminiy. */
+const PT_QS = "method=99&methodSettings=15,null,15&school=1&tune=0,-3,-5,5,0,4,0,0,0";
 const MAKKAH = [21.4225, 39.8262];
 /* Rasmiy jonli efir kanallari (Saudiya Radio va Televideniye idorasi, SBA). 2026-11-25 tekshirildi:
    YouTube tasdiq belgisi bor, kanal tavsifida SBA'ga tegishli deyilgan, jonli efir ishlaydi va embed ruxsat etilgan.
@@ -266,7 +270,7 @@ const VIEWS = {
   async namoz() {
     return `<div class="card"><div class="row"><label for="reg">${T("Hudud")}</label><select id="reg">${regionOpts()}</select></div>
     <div id="pt" class="mut">${T("Yuklanmoqda…")}</div>
-    <div class="note">${T("Vaqtlar taxminiy hisob ({Aladhan}, 15°, Hanafiy). 2026-yil 25-noyabr kuni Toshkent uchun O'zbekiston musulmonlari idorasi ({muslim.uz}) jadvali bilan daqiqasigacha mos keldi. Rasmiy vaqt — {muslim.uz}.")}</div></div>`;
+    <div class="note">${T("Vaqtlar taxminiy hisob ({Aladhan}, 15°, Hanafiy). Idora Fatvo markazining taqvim boti ({@fatvouz_taqvim_bot}) jadvaliga moslangan: 2026-yil 25-noyabr – 1-dekabr kunlari daqiqasigacha tekshirildi (Asr ba'zan 1 daqiqa kech chiqishi mumkin). Rasmiy vaqt — {@fatvouz_taqvim_bot}.")}</div></div>`;
   },
   async tasbeh() {
     const c = store.get("tcount", 0), goal = store.get("tgoal", 33), rounds = store.get("trounds", 0);
@@ -346,7 +350,7 @@ const VIEWS = {
     <li>${T("Ruscha tarjima")}: QuranEnc.com — russian_rwwad (${T("versiya aniqlanmadi")}).</li>
     <li>${T("Inglizcha tarjima")}: QuranEnc.com — english_saheeh, ${T("versiya")} 1.1.2.</li>
     <li>${T("Audio")}: Quran.com / Quran Foundation (verses.quran.com).</li>
-    <li>${T("Namoz vaqtlari")}: Aladhan API (${T("taxminiy")}); ${T("rasmiy")}: <a href="https://muslim.uz" target="_blank" rel="noopener">muslim.uz</a>.</li>
+    <li>${T("Namoz vaqtlari")}: Aladhan API (${T("taxminiy")}), ${T("Idora Fatvo markazining taqvim botiga moslangan")}; ${T("rasmiy")}: <a href="https://t.me/fatvouz_taqvim_bot" target="_blank" rel="noopener">@fatvouz_taqvim_bot</a>, <a href="https://muslim.uz" target="_blank" rel="noopener">muslim.uz</a>.</li>
     <li>${T("Tasbeh zikrlari")}: <a href="https://sunnah.com/bukhari" target="_blank" rel="noopener">sunnah.com</a> — Sahih al-Bukhari 843, 6403, 6405; ${T("tarjima va solishtirish")}: <a href="https://hadeethenc.com" target="_blank" rel="noopener">HadeethEnc</a>. ${T("Olim tekshiruvi kerak.")}</li>
     <li>${T("Jonli efir")}: ${LIVE.map(l => `<a href="https://www.youtube.com/channel/${encodeURIComponent(l.channel)}" target="_blank" rel="noopener">${esc(l.handle)}</a>`).join(", ")} — ${T("Saudiya Radio va Televideniye idorasi ({SBA}), YouTube.")}</li></ul>
     <p class="mut">${T("Arabcha matn ikkinchi manba ({QuranEnc}) bilan 6236 oyat bo'yicha solishtirildi. Natija: {docs/tekshiruv-hisoboti.md}.")}</p>

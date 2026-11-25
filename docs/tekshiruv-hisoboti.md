@@ -47,6 +47,20 @@ Men ulardan birini "to'g'ri" deb tanlamadim. Ilovada Tanzil matni o'zgarishsiz k
 
 ## Boshqa tekshiruvlar
 - **Namoz vaqtlari:** Aladhan (15°/15°, Hanafiy, tuzatishlar 0,-3,-4,+5,-1,+3,0,-1) 2026-11-25 Toshkent: 05:59 / 07:18 / 12:15 / 15:16 / 17:00 / 18:17 — muslim.uz bosh sahifasidagi Idora jadvali bilan bir xil. Boshqa kunlar va hududlar tekshirilmagan (taxminiy).
+- **Namoz vaqtlari — Fatvo markazi boti (2026-11-25):** muslim.uz'da boshqa kun/hudud jadvali yo'q; Idora "РАМАЗОН УЧУН ЭНГ ҚУЛАЙ ТАҚВИМ!" maqolasida (muslim.uz, 20.02.2026) rasmiy manba sifatida Fatvo markazining @fatvouz_taqvim_bot Telegram botini ko'rsatgan. Bot Namangan viloyatidagi bir nuqta uchun (koordinata yozilmaydi — repo ochiq) haftalik jadval berdi:
+
+  | Kun | Bomdod | Quyosh | Peshin | Asr | Shom | Xufton |
+  |---|---|---|---|---|---|---|
+  | 25.11 | 05:50 | 07:09 | 12:07 | 15:09 | 16:54 | 18:10 |
+  | 26.11 | 05:51 | 07:10 | 12:07 | 15:09 | 16:53 | 18:10 |
+  | 27.11 | 05:52 | 07:11 | 12:08 | 15:08 | 16:53 | 18:10 |
+  | 28.11 | 05:53 | 07:12 | 12:08 | 15:08 | 16:53 | 18:10 |
+  | 29.11 | 05:54 | 07:13 | 12:08 | 15:07 | 16:52 | 18:09 |
+  | 30.11 | 05:55 | 07:14 | 12:09 | 15:07 | 16:52 | 18:09 |
+  | 01.12 | 05:56 | 07:15 | 12:09 | 15:07 | 16:52 | 18:09 |
+
+  Usul: Aladhan formulasi (PrayTimes) kompyuterda takrorlandi va Namangan shahri uchun Aladhan bilan solishtirildi (42 dan 39 mos; farq faqat Asr'da, Aladhan ~0,2–0,4 daqiqa kech). Foydalanuvchi nuqtasi tashqi xizmatga yuborilmadi. Eski tuzatishlar bilan Quyosh +1, Asr/Shom/Xufton −1 daqiqa farq bor edi. Yangi tuzatishlar `0,-3,-5,5,0,4,0,0,0` bilan formula botga 42/42 mos. Aladhan orqali Asr 7 kundan taxminan 2 tasida +1 daqiqa chiqishi mumkin.
+  Ziddiyat: yangi tuzatishlar bilan Toshkent 25.11 Quyosh/Shom/Xufton 07:17/17:01/18:18 bo'ladi, muslim.uz sahifasi esa 07:18/17:00/18:17 ko'rsatadi — Idoraning ikki manbasi 1 daqiqa farq qiladi. Egasi qarori: Fatvo botiga moslash.
 - **Hijriy sana:** Umm al-Qura bo'yicha 2026-11-25 = 15 Jumodul oxir 1448; muslim.uz ham "15 Жумадул сони, 1448" ko'rsatdi — mos.
 - **Quran.com tajvid matni** ishlatilmadi: unda dagger-alif (U+0670) o'rniga U+0672 kodi bor (masalan 1:6), bu boshqa harf sifatida ko'rinishi mumkin.
 - **Tarjimalar:** QuranEnc javobidan so'zma-so'z olindi, kirill yozuvida qoldirildi. Versiya: uzbek_sadiq va russian_rwwad — "versiya aniqlanmadi" (ro'yxat API'da yo'q); english_saheeh 1.1.2.
