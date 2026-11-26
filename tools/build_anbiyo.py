@@ -1,8 +1,8 @@
 """Builds data/anbiyo.json for the "Payg'ambarlar" (prophets) screen.
 
 This script holds ONLY names used as search keys, references and interface labels. It contains no religious text:
-the app shows verses from data/s/NNN.json (Tanzil Arabic, QuranEnc translations and footnotes, verbatim) and
-hadiths from data/hadis.json (HadeethEnc + sunnah.com Bukhari number, verbatim).
+the app shows verses from data/s/NNN.json (Tanzil Arabic, QuranEnc translations and footnotes, verbatim).
+(Hadiths were removed with the Hadislar section, owner's decision 2026-11-26.)
 
 Source for "25 prophets are named in the Quran, the first is Adam, the last is Muhammad":
   O'zbekiston musulmonlari idorasi, muslim.uz, "Иймон" (30.01.2019), https://muslim.uz/oz/e/post/28371-iymon
@@ -16,19 +16,14 @@ A verse is listed for a prophet when BOTH hold (checked by machine):
   - its Uzbek translation (or its footnote) contains the prophet's name (Cyrillic, as the translator writes it).
   The second condition removes words that only look like a name in Arabic: صالح "righteous", هود "Jews",
   يحيي "gives life".
-Hadiths are listed for a prophet when the hadith's Uzbek text names him and its Arabic text contains his Arabic name
-(a name after أبو/أبي/أبا or «Абу» is a companion's kunya, e.g. Abu Musa, and a reference such as [إبراهيم: 27]
-is a sura name: neither counts).
-For Muhammad ﷺ the expanded section adds: verses that address him "يا أيها النبي" / "يا أيها الرسول", and the hadiths
-of data/hadis.json that HadeethEnc files under "Пайғамбаримиз Муҳаммад" (81) or "Пайғамбаримиз сийратлари" (367).
+For Muhammad ﷺ the expanded section adds the verses that address him "يا أيها النبي" / "يا أيها الرسول".
 
 Prophets are never depicted: the app shows text only.
-Usage: python -I -X utf8 tools/build_anbiyo.py <cache dir outside the repo> data
+Usage: python -I -X utf8 tools/build_anbiyo.py data
 """
-import json, sys, re, os, time, datetime, urllib.request
+import json, sys, re, datetime
 
-CACHE, D = sys.argv[1], sys.argv[2]
-os.makedirs(CACHE, exist_ok=True)
+D = sys.argv[1]
 LET = re.compile(r"[ء-يٱ]")
 FOLD = str.maketrans({"أ": "ا", "إ": "ا", "آ": "ا", "ٱ": "ا", "ى": "ي", "ة": "ه", "ؤ": "ء", "ئ": "ء"})
 
@@ -38,6 +33,7 @@ def bare(w):
 def tokens(ar):
     return [bare(w) for w in ar.split()]
 
+# Owner's rule (2026-11-26): the Prophet Muhammad's name always carries ﷺ in interface text (never added to source text).
 # (key, label (Latin, interface), Uzbek name regex (Cyrillic, search key only), Arabic bare name forms)
 # A form with a space is a two-word name (e.g. ذا الكفل is matched on its second word with the first before it).
 ANBIYO = [
@@ -65,9 +61,8 @@ ANBIYO = [
     ("zakariyo", "Zakariyo", r"Закариё", ["زكريا"]),
     ("yahyo", "Yahyo", r"Яҳё", ["يحيي"]),
     ("iyso", "Iyso", r"Ийсо|Масийҳ", ["عيسي", "المسيح"]),
-    ("muhammad", "Muhammad", r"Муҳаммад|Аҳмад", ["محمد", "احمد"]),
+    ("muhammad", "Muhammad ﷺ", r"Муҳаммад|Аҳмад", ["محمد", "احمد"]),
 ]
-SURAREF = re.compile(r"\[[^\]]*:\s*\d+\]")  # a quoted verse's reference, e.g. [إبراهيم: 27], is a sura name
 KUNYA = {"ابو", "ابي", "ابا"}
 PREFIX = re.compile(r"^[وفبلكي]{0,2}$")
 
@@ -92,33 +87,6 @@ def uz_rx(r):
     return re.compile(r"(?<![\w-])(?<!Абу )(?:" + r + r")")
 
 suras = {n: json.load(open(f"{D}/s/{n:03}.json", encoding="utf-8")) for n in range(1, 115)}
-hadis = json.load(open(f"{D}/hadis.json", encoding="utf-8"))["items"]
-
-def fetch(url, name):
-    path = os.path.join(CACHE, name)
-    if not os.path.exists(path):
-        for i in range(6):
-            try:
-                with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "kitab-data-build"}),
-                                            timeout=60) as r:
-                    data = r.read()
-                break
-            except Exception:
-                if i == 5:
-                    raise
-                time.sleep(20)
-        open(path, "wb").write(data)
-    return json.load(open(path, encoding="utf-8"))
-
-def he_cat(cid):
-    ids, p = [], 1
-    while True:
-        r = fetch(f"https://hadeethenc.com/api/v1/hadeeths/list/?language=uz&category_id={cid}&page={p}&per_page=100",
-                  f"anb_cat{cid}_{p}.json")
-        ids += [x["id"] for x in r["data"]]
-        if p >= int(r["meta"]["last_page"]):
-            return ids
-        p += 1
 
 def ref_groups(refs):
     """[(s, a)] -> [{"s": s, "a": [a, ...]}] in Mushaf order"""
@@ -144,15 +112,11 @@ for key, label, urx, forms in ANBIYO:
                 ar_only.append(f"{n}:{i+1}")
             elif rx.search(d["uz"][i]):
                 uz_only.append(f"{n}:{i+1}")
-    hids = [h["id"] for h in hadis if rx.search(SURAREF.sub("", h["uz"])) and has_name(tokens(SURAREF.sub("", h["ar"])), forms)]
-    for h in hadis:
-        if h["id"] in hids:
-            print("  ", label, h["id"], h["title"][:90])
     if not refs:
         sys.exit(f"{label}: no verse")
     items.append({"key": key, "label": label, "first": f"{refs[0][0]}:{refs[0][1]}", "n": len(refs),
-                  "verses": ref_groups(refs), "hadis": hids})
-    report.append(f"{label}: {len(refs)} oyat, {len(hids)} hadis | faqat arabchada: {ar_only[:12]}"
+                  "verses": ref_groups(refs)})
+    report.append(f"{label}: {len(refs)} oyat | faqat arabchada: {ar_only[:12]}"
                   f" | faqat tarjimada: {len(uz_only)} {uz_only[:8]}")
 
 # order: Adam first, Muhammad last, the rest by first mention
@@ -171,8 +135,6 @@ for n, d in suras.items():
             if t[j] == "يايها" and t[j + 1] in ("النبي", "الرسول"):
                 addr["nabiy" if t[j + 1] == "النبي" else "rasul"].append((n, i + 1))
                 break
-have = {h["id"] for h in hadis}
-mh = [i for i in dict.fromkeys(he_cat(81) + he_cat(367)) if i in have]
 muh = items[-1]
 muh["extra"] = [
     {"key": "nabiy", "title": "«Ey Payg'ambar» deb murojaat qilingan oyatlar", "q": "يَٰٓأَيُّهَا ٱلنَّبِىُّ",
@@ -180,7 +142,6 @@ muh["extra"] = [
     {"key": "rasul", "title": "«Ey Rasul» deb murojaat qilingan oyatlar", "q": "يَٰٓأَيُّهَا ٱلرَّسُولُ",
      "verses": ref_groups(addr["rasul"])},
 ]
-muh["hadis"] = list(dict.fromkeys(muh["hadis"] + mh))
 
 out = {
     "status": "Olim tekshiruvi kerak",
@@ -195,7 +156,6 @@ out = {
         "uz": "QuranEnc.com — uzbek_sadiq V1.0.1 (25.06.2025)",
         "ru": "QuranEnc.com — russian_rwwad V1.0.1 (29.03.2026)",
         "en": "QuranEnc.com — english_saheeh 1.1.2",
-        "hadis": "HadeethEnc.com + sunnah.com (data/hadis.json)",
     },
     "items": items,
 }
@@ -203,4 +163,4 @@ with open(f"{D}/anbiyo.json", "w", encoding="utf-8") as f:
     json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
 print("\n".join(report))
 print("order:", ", ".join(x["label"] for x in items))
-print("Muhammad: nabiy", len(addr["nabiy"]), "rasul", len(addr["rasul"]), "hadis", len(muh["hadis"]), mh)
+print("Muhammad: nabiy", len(addr["nabiy"]), "rasul", len(addr["rasul"]))
