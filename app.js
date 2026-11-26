@@ -113,6 +113,8 @@ let hadisCache = null;
 async function loadHadis() { return hadisCache ||= await getJSON("data/hadis.json"); }
 let duoCache = null;
 async function loadDuolar() { return duoCache ||= await getJSON("data/duolar.json"); }
+let anbCache = null;
+async function loadAnbiyo() { return anbCache ||= await getJSON("data/anbiyo.json"); }
 async function loadSura(n) {
   if (!suraCache.has(n)) suraCache.set(n, await getJSON(`data/s/${String(n).padStart(3, "0")}.json`));
   return suraCache.get(n);
@@ -175,7 +177,7 @@ function stopAll() { audio.pause(); pl.sura = 0; updPlayer(); markAyah(); }
 function markAyah() {
   document.querySelectorAll(".ayah.on").forEach(e => e.classList.remove("on"));
   document.querySelectorAll(".ayah [data-play][aria-pressed=true]").forEach(b => { b.setAttribute("aria-pressed", "false"); b.textContent = "▶"; });
-  if (route.name === "duolar") return markDuo();
+  if (route.name === "duolar" || route.name === "anbiyo") return markDuo();
   if (route.name !== "sura" || route.arg !== pl.sura) return;
   const el = document.getElementById("a" + pl.ayah);
   if (!el) return;
@@ -211,6 +213,7 @@ const ICON = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" st
 const MORE = [
   ["hadis", "Hadislar", "Sahih al-Buxoriy, sharhi bilan", '<path d="M6 3h9l3 3v15H6z"/><path d="M9 9h6M9 13h6M9 17h4"/>'],
   ["duolar", "Duolar", "Qur'ondagi duolar", '<path d="M8 21v-5L5 11l1.5-1.5L10 13"/><path d="M16 21v-5l3-5-1.5-1.5L14 13"/><path d="M12 3l1 2 2 .3-1.5 1.4.4 2.1L12 7.8 10.1 8.8l.4-2.1L9 5.3l2-.3z"/>'],
+  ["anbiyo", "Payg'ambarlar", "Qur'onda nomi zikr qilingan 25 payg'ambar", '<path d="M12 3l2.6 5.4 5.9.8-4.3 4.1 1 5.9L12 16.4 6.8 19.2l1-5.9-4.3-4.1 5.9-.8z"/>'],
   ["ramazon", "Ramazon taqvimi", "Saharlik va iftorlik vaqtlari", '<path d="M15 3a9 9 0 1 0 6 15A7 7 0 0 1 15 3z"/>'],
   ["jonli", "Makka va Madina", "Jonli efir", '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M10 10l5 2.5-5 2.5z"/>'],
   ["tajvid", "Tajvid", "Qur'on o'qish qoidalari", '<path d="M4 19l4-14h8l4 14"/><path d="M7 13h10"/>'],
@@ -390,6 +393,40 @@ const VIEWS = {
         ${T("Audio")}: ${T("qori")} ${esc(reciter().name)} — <a href="https://quran.foundation" target="_blank" rel="noopener">Quran Foundation</a> (verses.quran.foundation).
         ${T("Duolar tanlovi")}: Claude, ${T("manba emas")}. <br>${T("Holat: olim tekshiruvi kutilmoqda.")}</p></div>`;
   },
+  /* Payg'ambarlar: data/anbiyo.json (tools/build_anbiyo.py) — faqat havolalar. Oyatlar data/s/ dan, hadislar data/hadis.json dan,
+     o'zgarishsiz. Payg'ambarlar hech qachon tasvirlanmaydi: faqat matn. */
+  async anbiyo() {
+    let d = null;
+    try { d = await loadAnbiyo(); } catch {}
+    if (!d) return `<div class="card"><h2>${T("Payg'ambarlar")}</h2><p class="mut">${T("Ma'lumotni yuklab bo'lmadi. Internetni tekshiring.")}</p></div>`;
+    const src = `<div class="card"><p class="src" style="margin-top:0;border:0;padding:0">${T("Arabcha matn")}: <a href="https://tanzil.net" target="_blank" rel="noopener">Tanzil Project</a> (Uthmani 1.1, CC BY 3.0).
+        ${st.tr !== "none" ? `${T("Tarjima")}: ${trCredit()} — <a href="https://quranenc.com" target="_blank" rel="noopener">QuranEnc.com</a>.` : ""}
+        ${T("Hadislar")}: <a href="https://hadeethenc.com" target="_blank" rel="noopener">HadeethEnc.com</a>, ${T("raqami")} — <a href="https://sunnah.com/bukhari" target="_blank" rel="noopener">sunnah.com</a>.
+        ${T("Oyatlar ro'yxati")}: Claude, ${T("manba emas")}. <br>${T("Holat: olim tekshiruvi kutilmoqda.")}</p></div>`;
+    const it = route.arg && d.items[route.arg - 1];
+    if (!it) return `<div class="card"><h2>${T("Payg'ambarlar")}</h2>
+      <div class="note">${T("Olim tekshiruvi kerak.")} ${T("Payg'ambarlar hech qachon tasvirlanmaydi: bu bo'limda faqat oyat va hadis matni bor.")}</div>
+      <p class="mut">${T("Manba")}: <a href="${esc(d.count_source.url)}" target="_blank" rel="noopener">muslim.uz, «${T("Iymon")}» (${esc(d.count_source.date)})</a> — ${T("Qur'oni karimda 25 payg'ambarning nomi zikr qilingan, avvalgisi Odam, so'nggisi Muhammad (maqoladan qisqacha mazmun).")}</p>
+      <details><summary class="mut">${T("Ro'yxat qanday tuzildi?")}</summary>
+        <p class="mut">${T("Maqolada 25 ism sanab berilmagan. Shuning uchun ro'yxatga Qur'onning arabcha matnida ham, o'zbekcha tarjimasida ham ism sifatida kelgan 25 payg'ambar olindi (dastur bilan tekshirildi).")}</p>
+        <p class="mut">${T("Tartib: Odam birinchi, Muhammad oxirida (maqoladagidek). Qolganlari Qur'onda birinchi marta zikr qilingan joyi bo'yicha (bu tarixiy tartib emas).")}</p>
+        <p class="mut">${T("Oyatlar: arabcha matnda payg'ambar ismi bor va tarjimada ham shu ism yozilgan oyatlar. Hadislar: Hadislar bo'limidagi, ismi arabcha va o'zbekcha matnda kelgan hadislar.")}</p>
+        <p class="mut">${T("Ro'yxatni {Claude} (sun'iy intellekt) shu mezon bo'yicha tuzgan — bu manba emas.")}</p></details></div>
+      <div class="grid">${d.items.map((x, i) => `<button class="tile" data-nabiy="${i + 1}"><b>${T(x.label)}</b><small>${T(honor(x))}</small><small>${x.n} ${T("oyat")}${x.hadis.length ? ` · ${x.hadis.length} ${T("hadis")}` : ""}</small></button>`).join("")}</div>${src}`;
+    let H = [];
+    if (it.hadis.length) { try { const hd = await loadHadis(); H = it.hadis.map(id => hd.items.find(h => h.id === id)).filter(Boolean); } catch {} }
+    const sec = (title, groups, note = "") => {
+      const n = groups.reduce((k, g) => k + g.a.length, 0), open = n <= 8;
+      return `<div class="card"><h3>${T(title)} (${n})</h3>${note}</div>${groups.map(g => anbGroup(g, open)).join("")}`;
+    };
+    return `<div class="card"><h2>${T(it.label)} <small class="mut">${T(honor(it))}</small></h2>
+      <div class="note">${T("Olim tekshiruvi kerak.")} ${T("Payg'ambarlar hech qachon tasvirlanmaydi.")} ${T("Oyat va hadislar manbadan o'zgarishsiz olingan; ro'yxatni {Claude} tuzgan, manba emas.")}</div>
+      <p class="mut">${T("Qur'onda birinchi zikri")}: ${esc(it.first)}</p></div>
+      ${sec("Qur'onda nomi zikr qilingan oyatlar", it.verses)}
+      ${(it.extra || []).map(x => sec(x.title, x.verses, `<p class="ar" dir="rtl" lang="ar">${esc(x.q)}</p>`)).join("")}
+      ${H.length ? `<div class="card"><h3>${T("Hadislar")} (${H.length})</h3><p class="mut">${T("Sahih al-Buxoriy, Hadislar bo'limidan.")}</p></div>${H.map(hadisCard).join("")}` : ""}
+      ${src}`;
+  },
   async harflar() {
     return `<div class="card"><p class="mut">${T("Harfga bosing — uning so'z boshida, o'rtasida va oxiridagi shakli chiqadi.")}</p>
     <div id="lform"></div><div class="letters">${LETTERS.map(([c, n], i) => `<button data-letter="${i}"><span class="l">${c}</span><small>${T(n)}</small></button>`).join("")}</div></div>`;
@@ -427,6 +464,7 @@ const VIEWS = {
     <li>${T("Tasbeh zikrlari")}: <a href="https://sunnah.com/bukhari" target="_blank" rel="noopener">sunnah.com</a> — Sahih al-Bukhari 843, 6403, 6405; ${T("tarjima va solishtirish")}: <a href="https://hadeethenc.com" target="_blank" rel="noopener">HadeethEnc</a>. ${T("843 va 6403 ning o'zbekcha tarjimasi manbada yo'q: ularni {Claude} (sun'iy intellekt) manbadagi inglizcha/ruscha matndan o'girgan, bu manba emas.")} ${T("Olim tekshiruvi kerak.")}</li>
     <li>${T("Hadislar")}: ${T("matn, o'zbekcha tarjima, daraja va sharh")} — <a href="https://hadeethenc.com" target="_blank" rel="noopener">HadeethEnc.com</a>, ${T("o'zgartirilmagan, kirillda")}; ${T("hadis raqami")} — <a href="https://sunnah.com/bukhari" target="_blank" rel="noopener">sunnah.com</a> (Sahih al-Bukhari). ${T("Har bir hadisning so'zlari Buxoriy matnida harfma-harf topilgan; harakatlarda farq bo'lsa, ikkalasi ko'rsatiladi.")} ${T("Olim tekshiruvi kerak.")}</li>
     <li>${T("Duolar")}: ${T("oyatlar va tarjimalar yuqoridagi manbalardan ({Tanzil}, {QuranEnc.com}) o'zgarishsiz olingan. Duolar ro'yxatini {Claude} (sun'iy intellekt) tanlagan, bu manba emas: {muslim.uz} va {sunnah.com} ({Hisn al-Muslim})da tayyor ro'yxat topilmadi.")} ${T("Olim tekshiruvi kerak.")}</li>
+    <li>${T("Payg'ambarlar")}: ${T("25 payg'ambar soni")} — <a href="https://muslim.uz/oz/e/post/28371-iymon" target="_blank" rel="noopener">muslim.uz, «${T("Iymon")}» (30.01.2019)</a>. ${T("Oyatlar ({Tanzil}, {QuranEnc.com}) va hadislar ({HadeethEnc}, {sunnah.com}) o'zgarishsiz; ro'yxatni {Claude} (sun'iy intellekt) mezon bo'yicha tuzgan, bu manba emas. Payg'ambarlar tasvirlanmaydi.")} ${T("Olim tekshiruvi kerak.")}</li>
     <li>${T("Jonli efir")}: ${LIVE.map(l => `<a href="https://www.youtube.com/channel/${encodeURIComponent(l.channel)}" target="_blank" rel="noopener">${esc(l.handle)}</a>`).join(", ")} — ${T("Saudiya Radio va Televideniye idorasi ({SBA}), YouTube.")}</li></ul>
     <p class="mut">${T("Arabcha matn ikkinchi manba ({QuranEnc}) bilan 6236 oyat bo'yicha solishtirildi. Natija: {docs/tekshiruv-hisoboti.md}.")}</p>
     <div class="note">${T("Sinov versiyasi. O'zbekiston musulmonlari idorasi tasdiqlamaguncha ommaga chiqarilmaydi.")}</div></div>`;
@@ -507,6 +545,22 @@ function markDuo() {
   const r = [...document.querySelectorAll("[data-pr]")].find(x => { const [s, a, e] = x.dataset.pr.split(":").map(Number); return s === pl.sura && a <= pl.ayah && pl.ayah <= e; });
   if (r) { r.setAttribute("aria-pressed", "true"); r.textContent = T("❚❚ To'xtatish"); }
 }
+/* Payg'ambar ismidan keyingi duo (interfeys matni). */
+const honor = x => x.key === "muhammad" ? "sollallohu alayhi va sallam" : "alayhissalom";
+/* Payg'ambarlar: bitta suradagi oyatlar guruhi. Matn ochilganda data/s/ dan yuklanadi (fillAnb). */
+function anbGroup(g, open) {
+  const m = SURAS[g.s - 1];
+  return `<details class="card anb-g" data-s="${g.s}" data-a="${g.a.join(",")}"${open ? " open" : ""}><summary><b lang="${m.uz ? "uz-Cyrl" : "en"}">${esc(sname(m))}</b> <span class="mut">(${g.s}) · ${g.a.length} ${T("oyat")}</span></summary><div class="anb-v"></div></details>`;
+}
+async function fillAnb(el) {
+  const box = el.querySelector(".anb-v"); if (box.dataset.done) return; box.dataset.done = 1;
+  const s = +el.dataset.s, tr = st.tr !== "none" ? st.tr : null;
+  let d; try { d = await loadSura(s); } catch { box.dataset.done = ""; box.innerHTML = `<p class="mut">${T("Yuklab bo'lmadi. Internetni tekshiring.")}</p>`; return; }
+  box.innerHTML = el.dataset.a.split(",").map(Number).map(a => `<div class="ayah"><div class="arow"><span class="num">${a}</span><a class="mut" href="#sura/${s}" data-open="${s}" data-ayah="${a}">${s}:${a}</a><span class="sp"></span>
+      <button class="ib" data-pa="${s}:${a}" aria-pressed="false" aria-label="${T("Oyatni tinglash")} ${s}:${a}">▶</button></div>
+      <p class="ar" dir="rtl" lang="ar">${esc(d.ar[a - 1])}</p>${tr ? `<div class="tr" lang="${TRLANG[tr]}">${esc(d[tr][a - 1])}</div>` : ""}${tr && st.fn && d[tr + "_fn"][a - 1] ? `<div class="fn" lang="${TRLANG[tr]}">${esc(d[tr + "_fn"][a - 1])}</div>` : ""}</div>`).join("");
+  markDuo();
+}
 function trCredit() { return { uz: T("Shayx Muhammad Sodiq Muhammad Yusuf ({uzbek_sadiq, V1.0.1})"), ru: "Rowwad (russian_rwwad, V1.0.1)", en: "Saheeh International (english_saheeh 1.1.2)" }[st.tr] || ""; }
 function regionOpts() { return Object.entries(REGIONS).map(([k, r]) => `<option value="${k}" ${k === st.region ? "selected" : ""}>${T(r[0])}</option>`).join(""); }
 function suraItems(q) {
@@ -574,6 +628,10 @@ const AFTER = {
     $("#hq").oninput = () => { shown = PAGE; draw(); };
     $("#hmore").onclick = () => { shown += PAGE; draw(); };
     draw();
+  },
+  anbiyo() {
+    document.querySelectorAll(".anb-g").forEach(el => { if (el.open) fillAnb(el); el.addEventListener("toggle", () => el.open && fillAnb(el)); });
+    markDuo();
   },
   duolar() {
     document.querySelectorAll("[data-dgroup]").forEach(b => b.onclick = () => { store.set("dgroup", b.dataset.dgroup); render(); });
@@ -675,6 +733,7 @@ document.addEventListener("click", e => {
   const t = e.target.closest("button, a[data-open]"); if (!t) return;
   if (t.dataset.tab) return go(t.dataset.tab);
   if (t.dataset.go) return go(t.dataset.go);
+  if (t.dataset.nabiy) return go("anbiyo", +t.dataset.nabiy);
   if (t.dataset.open) { e.preventDefault(); pendingAyah = t.dataset.ayah ? +t.dataset.ayah : 0; return go("sura", +t.dataset.open); }
   if (t.dataset.pa) {
     const [s, a] = t.dataset.pa.split(":").map(Number);

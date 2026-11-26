@@ -133,3 +133,6 @@ table.tt tr.today td{background:rgb(255 215 106/.1);color:var(--goldb);font-weig
 .hd summary{color:var(--gold);cursor:pointer;padding:6px 0}
 .hd ul.fn{padding-left:20px}
 .hd .farq-row{grid-template-columns:1fr}
+/* Payg'ambarlar */
+.anb-g summary{cursor:pointer;padding:2px 0}
+.anb-g .ayah:first-child{margin-top:8px}
