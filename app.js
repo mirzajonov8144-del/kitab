@@ -20,6 +20,8 @@ const st = {
   hijriAdj: store.get("hijriAdj", 0),
   region: store.get("region", "toshkent"),
   autoNext: store.get("autoNext", false),
+  follow: store.get("follow", true),         // qori o'qiyotgan so'zni marker bilan ajratish
+  wcolor: store.get("wcolor", "oltin"),      // marker rangi: WCOLORS kaliti
   last: store.get("last", null)
 };
 const save = k => store.set(k, st[k]);
@@ -141,6 +143,49 @@ const reciter = () => RECITERS.find(r => r.id === st.reciter) || RECITERS[0];
 const audioURL = (s, a) => `${AUDIO_BASE}${reciter().dir}${pad3(s)}${pad3(a)}.mp3`;
 const preload = new Audio();
 
+/* So'zma-so'z ergashish (egasi tanlovi, 2026-11-26: «A — Oltin marker»).
+   So'z vaqtlari: Quran Foundation (api.qurancdn.com, verses.quran.foundation dagi o'sha fayllar uchun).
+   Faqat ilova ishlayotganda olinadi, repoga ham keshga ham saqlanmaydi (Developer Terms: rehost yo'q).
+   Matnga hech narsa qo'shilmaydi: oyat so'zlari bo'sh joy bo'yicha <span> ga o'raladi, xolos.
+   So'zlar soni vaqtlardagi so'zlar soniga teng bo'lmasa (masalan 2:181), shu oyatda ajratilmaydi. */
+const SEG_API = "https://api.qurancdn.com/api/v4/recitations/";
+/* Marker ranglari (egasi so'rovi, 2026-11-26: rang tanlansin, oltin biroz ochroq). [kalit, nom, rang] */
+const WCOLORS = [["oltin", "Oltin", "rgb(250 199 117/.42)"], ["feruza", "Feruza", "rgb(93 202 165/.32)"], ["kok", "Ko'k", "rgb(133 183 235/.38)"],
+  ["yashil", "Yashil", "rgb(151 196 89/.36)"], ["pushti", "Pushti", "rgb(237 147 177/.34)"]];
+const setWColor = () => document.documentElement.style.setProperty("--wmark", (WCOLORS.find(c => c[0] === st.wcolor) || WCOLORS[0])[2]);
+setWColor();
+const segCache = new Map();
+function loadSeg(s) {
+  const k = reciter().id + ":" + s;
+  if (!segCache.has(k)) segCache.set(k, fetch(`${SEG_API}${reciter().id}/by_chapter/${s}?per_page=300&fields=segments`)
+    .then(r => r.ok ? r.json() : Promise.reject(r.status))
+    .then(d => { const m = {}; for (const f of d.audio_files || []) m[+f.verse_key.split(":")[1]] = (f.segments || []).filter(x => x.length >= 4).map(x => x.slice(1, 4).map(Number)); return m; })
+    .catch(() => { segCache.delete(k); return null; }));
+  return segCache.get(k);
+}
+const wordsHTML = t => t.split(" ").map(w => `<span class="w">${esc(w)}</span>`).join(" ");
+let followSeg = null, followRAF = 0;
+function clearFollow() { document.querySelectorAll(".w.wnow").forEach(e => e.classList.remove("wnow")); }
+function followTick() {
+  followRAF = 0;
+  if (!st.follow || audio.paused || route.name !== "sura" || route.arg !== pl.sura) { clearFollow(); return; }
+  followRAF = requestAnimationFrame(followTick);
+  const seg = followSeg && followSeg.s === pl.sura && followSeg.rid === reciter().id && followSeg.m ? followSeg.m[pl.ayah] : null;
+  const ws = document.querySelectorAll(`#a${pl.ayah} .ar .w`);
+  if (!seg || !seg.length || !ws.length || Math.max(...seg.map(x => x[0])) !== ws.length) { clearFollow(); return; }
+  const t = audio.currentTime * 1000;
+  let cur = null;
+  for (const [pos, a, b] of seg) if (t >= a && t < b + 400) cur = pos;
+  ws.forEach((w, i) => w.classList.toggle("wnow", i + 1 === cur));
+  document.querySelectorAll(".w.wnow").forEach(e => { if (!e.closest(`#a${pl.ayah}`)) e.classList.remove("wnow"); });
+}
+function startFollow() {
+  if (!st.follow || !pl.sura) return;
+  const s = pl.sura, rid = reciter().id;
+  if (!followSeg || followSeg.s !== s || followSeg.rid !== rid) { followSeg = { s, rid, m: null }; loadSeg(s).then(m => { if (followSeg.s === s && followSeg.rid === rid) followSeg.m = m; }); }
+  if (!followRAF) followRAF = requestAnimationFrame(followTick);
+}
+
 function playAyah(s, a, mode) {
   const meta = SURAS[s - 1];
   pl.sura = s; pl.ayah = a; pl.total = meta.v; if (mode) pl.mode = mode;
@@ -165,7 +210,7 @@ audio.addEventListener("ended", () => {
   pl.playing = false; updPlayer(); markAyah();
 });
 audio.addEventListener("pause", () => { pl.playing = false; updPlayer(); });
-audio.addEventListener("play", () => { pl.playing = true; updPlayer(); });
+audio.addEventListener("play", () => { pl.playing = true; updPlayer(); startFollow(); });
 audio.addEventListener("error", () => updPlayer(true));
 if ("mediaSession" in navigator) {
   navigator.mediaSession.setActionHandler("nexttrack", () => step(1));
@@ -281,11 +326,11 @@ const VIEWS = {
       const a = i + 1, txt = i === 0 && bism ? bism[1] : ar;
       h += `<div class="ayah" id="a${a}"><div class="arow"><span class="num">${a}</span><span class="sp"></span>
       <button class="ib" data-play="${a}" aria-pressed="false" aria-label="${T("Oyatni tinglash")} ${a}">▶</button></div>
-      <p class="ar">${esc(txt)}</p>${tr ? `<div class="tr">${esc(tr[i])}</div>` : ""}${st.fn && fns && fns[i] ? `<div class="fn">${esc(fns[i])}</div>` : ""}</div>`;
+      <p class="ar">${wordsHTML(txt)}</p>${tr ? `<div class="tr">${esc(tr[i])}</div>` : ""}${st.fn && fns && fns[i] ? `<div class="fn">${esc(fns[i])}</div>` : ""}</div>`;
     });
     h += `<div class="src">${T("Arabcha matn")}: <a href="https://tanzil.net" target="_blank" rel="noopener">Tanzil Project</a> (Uthmani 1.1, CC BY 3.0).
       ${tr ? `${T("Tarjima")}: ${trCredit()} — <a href="https://quranenc.com" target="_blank" rel="noopener">QuranEnc.com</a>.` : ""}
-      ${T("Audio")}: ${T("qori")} <span id="recname">${esc(reciter().name)}</span> — <a href="https://quran.foundation" target="_blank" rel="noopener">Quran Foundation</a> (verses.quran.foundation).
+      ${T("Audio")}: ${T("qori")} <span id="recname">${esc(reciter().name)}</span> — <a href="https://quran.foundation" target="_blank" rel="noopener">Quran Foundation</a> (verses.quran.foundation)${st.follow ? `; ${T("so'z vaqtlari")} — Quran Foundation (api.qurancdn.com)` : ""}.
       ${meta.uz ? `${T("Sura nomi (o'zbekcha)")}: <a href="https://quranenc.com/uz/browse/uzbek_sadiq/${n}" target="_blank" rel="noopener">QuranEnc.com</a>.` : ""} <br>${T("Holat: olim tekshiruvi kutilmoqda.")}</div></div>
       <div class="row" style="justify-content:space-between">${n > 1 ? `<button class="btn2" data-open="${n - 1}">← ${esc(sname(SURAS[n - 2]))}</button>` : "<span></span>"}
       ${n < 114 ? `<button class="btn2" data-open="${n + 1}">${esc(sname(SURAS[n]))} →</button>` : ""}</div>`;
@@ -304,7 +349,7 @@ const VIEWS = {
     const top = sel ? `<p class="ar zk-now" id="tz" dir="rtl" lang="ar">${esc(sel.phrases[rounds % sel.phrases.length])}</p>
       ${sel.second?.compare.some(x => x.farq) ? `<p class="mut"><span class="farq-badge">FARQ BOR</span> ${T("Ikki manbada harakatlar farq qiladi — pastda ikkalasi ko'rsatilgan.")}</p>` : ""}` : "";
     return `<div class="card" style="text-align:center">${top}
-      <button class="counter" id="tap" aria-label="${T("Sanash")}"><span><span id="tc">${c}</span><small id="tg">${goal ? "/ " + goal : "∞"} · ${T("davra")}: <span id="tr">${rounds}</span></small></span></button>
+      <div class="tsb">${beadsSVG()}<button class="counter" id="tap" aria-label="${T("Sanash")}"><span><span id="tc">${c}</span><small id="tg">${goal ? "/ " + goal : "∞"} · ${T("davra")}: <span id="tr">${rounds}</span></small></span></button></div>
       <div class="row" style="justify-content:center">${[33, 99, 100, 0].map(g => `<button class="ib" data-goal="${g}" aria-pressed="${g === goal}">${g || "∞"}</button>`).join("")}</div>
       <div class="row" style="justify-content:center"><button class="btn2" id="treset">${T("Nolga qaytarish")}</button></div>
       <p class="mut">${T("Ekranning istalgan joyiga emas, faqat doiraga bosing. Maqsadga yetganda telefon titraydi.")}</p>
@@ -439,6 +484,8 @@ const VIEWS = {
     <div class="row"><label for="s-tr">${T("Tarjima")}</label><select id="s-tr">${[["uz", "O'zbekcha (Shayx Muhammad Sodiq Muhammad Yusuf) — kirill"], ["ru", "Ruscha ({Rowwad} markazi)"], ["en", "Inglizcha ({Saheeh International})"], ["none", "Tarjimasiz"]].map(([k, l]) => `<option value="${k}" ${st.tr === k ? "selected" : ""}>${T(l)}</option>`).join("")}</select></div>
     <div class="row"><label><input type="checkbox" id="s-fn" ${st.fn ? "checked" : ""}> ${T("Tarjima izohlarini ko'rsatish")}</label></div>
     <div class="row"><label for="s-rec">${T("Qori")}</label><select id="s-rec">${RECITERS.map(r => `<option value="${r.id}" ${r.id === st.reciter ? "selected" : ""}>${esc(r.name)}</option>`).join("")}</select></div>
+    <div class="row"><label><input type="checkbox" id="s-follow" ${st.follow ? "checked" : ""}> ${T("Qori o'qiyotgan so'zni ajratib ko'rsatish (marker)")}</label></div>
+    <div class="row"><label>${T("Marker rangi")}</label><div class="themes">${WCOLORS.map(([k, l, c]) => `<button data-wcolor="${k}" aria-pressed="${st.wcolor === k}"><i style="background:${c}"></i>${T(l)}</button>`).join("")}</div></div>
     <div class="row"><label for="s-size">${T("Arabcha shrift o'lchami")}</label><input type="range" id="s-size" min="22" max="44" value="${st.arsize}"></div>
     <div class="row"><label>${T("Mavzu")}</label><div class="themes">${THEMES.map(([k, l, c]) => `<button data-theme-pick="${k}" aria-pressed="${st.theme === k}"><i style="background:${c}"></i>${T(l)}</button>`).join("")}</div></div>
     <div class="row ${st.theme ? "hide" : ""}"><label>${T("Oyat rangi")}</label><div class="seg"><button data-style="k6" aria-pressed="${st.style === "k6"}">${T("Yorqin oltin")}</button><button data-style="k7" aria-pressed="${st.style === "k7"}">${T("Metall oltin")}</button></div></div>
@@ -453,6 +500,7 @@ const VIEWS = {
     <li>${T("Inglizcha tarjima")}: QuranEnc.com — english_saheeh, ${T("versiya")} 1.1.2.</li>
     <li>${T("Tarjimalar")} <a href="https://quranenc.com/en/home#transes" target="_blank" rel="noopener">QuranEnc.com</a> ${T("shartlari bo'yicha o'zgartirilmasdan beriladi. Xato topsangiz, {QuranEnc.com}'ga xabar bering.")}</li>
     <li>${T("Audio")}: <a href="https://quran.foundation" target="_blank" rel="noopener">Quran Foundation</a> (verses.quran.foundation), ${T("qorilar")}: ${RECITERS.map(r => esc(r.name)).join(", ")}. ${T("Audio ularning saytidan eshittiriladi, ilovada saqlanmaydi")} (<a href="https://api-docs.quran.foundation/legal/developer-terms/" target="_blank" rel="noopener">${T("shartlar")}</a>).</li>
+    <li>${T("So'zma-so'z ergashish")}: ${T("har bir so'z qachon o'qilishi (vaqtlari)")} — <a href="https://quran.foundation" target="_blank" rel="noopener">Quran Foundation</a> (api.qurancdn.com). ${T("Ilova ochiq turganda olinadi, saqlanmaydi. Oyat matniga hech narsa qo'shilmaydi.")}</li>
     <li>${T("Namoz vaqtlari")}: Aladhan API (${T("taxminiy")}), ${T("Idora Fatvo markazining taqvim botiga moslangan")}; ${T("rasmiy")}: <a href="https://t.me/fatvouz_taqvim_bot" target="_blank" rel="noopener">@fatvouz_taqvim_bot</a>, <a href="https://muslim.uz" target="_blank" rel="noopener">muslim.uz</a>.</li>
     <li>${T("Sura nomlari (o'zbekcha)")}: <a href="https://quranenc.com/uz/browse/uzbek_sadiq/1" target="_blank" rel="noopener">QuranEnc.com</a> — ${T("o'zgartirilmagan, kirillda. Olim tekshiruvi kerak.")}</li>
     <li>${T("Tasbeh zikrlari")}: <a href="https://sunnah.com/bukhari" target="_blank" rel="noopener">sunnah.com</a> — Sahih al-Bukhari 843, 6403, 6405; ${T("tarjima va solishtirish")}: <a href="https://hadeethenc.com" target="_blank" rel="noopener">HadeethEnc</a>. ${T("843 va 6403 ning o'zbekcha tarjimasi manbada yo'q: ularni {Claude} (sun'iy intellekt) manbadagi inglizcha/ruscha matndan o'girgan, bu manba emas.")} ${T("Olim tekshiruvi kerak.")}</li>
@@ -495,6 +543,23 @@ function zikrCard(z, sel) {
       <p class="mut">${T("Hadisning to'liq arabcha matni")}:</p><p class="ar zk-full" dir="rtl" lang="ar">${esc(z.hadith_ar)}</p>
     </details>
   </div>`;
+}
+/* Tasbeh donalari (egasi tanlovi, 2026-11-26: «C — 3D tasbeh donalari»). 33 dona doira bo'ylab; har bosishda ip bir
+   dona suriladi (aylanadi), sanalgan donalar oltinga aylanadi. Pastda imom donasi va popuk turadi (aylanmaydi). */
+const BEADS = 33, BSTEP = 360 / BEADS;
+function beadsSVG() {
+  let b = "";
+  for (let i = 0; i < BEADS; i++) {
+    const a = (-90 - (i + 1) * BSTEP) * Math.PI / 180, x = (150 + 132 * Math.cos(a)).toFixed(1), y = (150 + 132 * Math.sin(a)).toFixed(1);
+    b += `<g class="bd" data-i="${i}"><circle cx="${x}" cy="${y}" r="11"/><ellipse class="bh" cx="${(x - 3.5).toFixed(1)}" cy="${(y - 4).toFixed(1)}" rx="4" ry="2.6"/></g>`;
+  }
+  return `<svg class="tsb-ring" viewBox="0 0 300 300" aria-hidden="true"><defs>
+    <radialGradient id="bg0" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#9FE1CB"/><stop offset=".45" stop-color="#1D9E75"/><stop offset="1" stop-color="#04342C"/></radialGradient>
+    <radialGradient id="bg1" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#FFF0B8"/><stop offset=".45" stop-color="#D9A23A"/><stop offset="1" stop-color="#633806"/></radialGradient></defs>
+    <circle cx="150" cy="150" r="132" fill="none" stroke="var(--gold2,#c9a24a)" stroke-width="1.5" opacity=".6"/>
+    <g class="tsb-str" id="tstr">${b}</g>
+    <path d="M150 268 L150 284" stroke="var(--gold2,#c9a24a)" stroke-width="2.5"/><ellipse cx="150" cy="276" rx="6" ry="9" fill="url(#bg1)"/>
+    <path d="M144 286 h12 l3 12 h-18z" fill="var(--gold2,#c9a24a)"/></svg>`;
 }
 /* Farz kartasi: bloklar data/farz.json dan, o'zgarishsiz. Ketma-ket <li> lar manbadagidek ro'yxat bo'ladi. */
 function farzCard(x, d) {
@@ -623,6 +688,7 @@ const AFTER = {
     if (st.last && st.last.s === route.arg && st.last.a > 1 && pendingAyah === null) pendingAyah = st.last.a;
     if (pendingAyah) { const el = document.getElementById("a" + pendingAyah); if (el) setTimeout(() => el.scrollIntoView({ block: "center" }), 50); pendingAyah = null; }
     updPlayer();
+    if (st.follow) { loadSeg(route.arg); startFollow(); }
     const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { st.last = { s: route.arg, a: +e.target.id.slice(1) }; save("last"); } }), { rootMargin: "-45% 0px -50% 0px" });
     document.querySelectorAll(".ayah").forEach(a => io.observe(a));
   },
@@ -640,11 +706,21 @@ const AFTER = {
   tasbeh() {
     let c = store.get("tcount", 0), goal = store.get("tgoal", 33), rounds = store.get("trounds", 0);
     const sel = (zikrCache || []).find(z => z.id === store.get("tzikr", ""));
-    const draw = () => {
+    const beads = [...document.querySelectorAll("#tstr .bd")];
+    const ring = (pop) => {
+      const tt = rounds * (goal || 0) + c, k = c % BEADS;
+      $("#tstr").style.transform = `rotate(${tt * BSTEP}deg)`;
+      beads.forEach((b, i) => { const back = ((tt - 1 - i) % BEADS + BEADS) % BEADS; b.classList.toggle("on", back < k); });
+      if (pop) { const b = beads[((tt - 1) % BEADS + BEADS) % BEADS]; b.classList.remove("pop"); void b.getBBox(); b.classList.add("pop"); }
+      if (pop && c % BEADS === 0) { const r = document.querySelector(".tsb"); r.classList.remove("full"); void r.offsetWidth; r.classList.add("full"); }
+    };
+    ring(false);
+    const draw = (pop) => {
+      ring(pop);
       $("#tc").textContent = c; $("#tr").textContent = rounds; store.set("tcount", c); store.set("trounds", rounds);
       if (sel && $("#tz")) $("#tz").textContent = sel.phrases[rounds % sel.phrases.length];
     };
-    $("#tap").onclick = () => { c++; if (goal && c >= goal) { rounds++; c = 0; navigator.vibrate?.([80, 60, 80]); } else navigator.vibrate?.(15); draw(); };
+    $("#tap").onclick = () => { c++; if (goal && c >= goal) { rounds++; c = 0; navigator.vibrate?.([80, 60, 80]); } else navigator.vibrate?.(15); draw(true); };
     $("#treset").onclick = () => { c = 0; rounds = 0; draw(); };
     document.querySelectorAll("[data-goal]").forEach(b => b.onclick = () => { store.set("tgoal", +b.dataset.goal); store.set("tzikr", ""); render(); });
     document.querySelectorAll("[data-zikr]").forEach(b => b.onclick = () => {
@@ -701,6 +777,8 @@ const AFTER = {
   sozlama() {
     $("#s-tr").onchange = e => { st.tr = e.target.value; save("tr"); };
     $("#s-fn").onchange = e => { st.fn = e.target.checked; save("fn"); };
+    $("#s-follow").onchange = e => { st.follow = e.target.checked; save("follow"); if (!st.follow) clearFollow(); };
+    document.querySelectorAll("[data-wcolor]").forEach(b => b.onclick = () => { st.wcolor = b.dataset.wcolor; save("wcolor"); setWColor(); document.querySelectorAll("[data-wcolor]").forEach(x => x.setAttribute("aria-pressed", x === b)); });
     $("#s-rec").onchange = e => { st.reciter = +e.target.value; save("reciter"); };
     $("#s-size").oninput = e => { st.arsize = +e.target.value; save("arsize"); document.documentElement.style.setProperty("--arsize", st.arsize + "px"); $(".card .ar").style.setProperty("--arsize", st.arsize + "px"); };
     document.querySelectorAll("[data-theme-pick]").forEach(b => b.onclick = () => { st.theme = b.dataset.themePick; save("theme"); render(); });

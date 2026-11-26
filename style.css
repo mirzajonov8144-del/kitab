@@ -68,7 +68,7 @@ nav.bottom button[aria-current=page]{color:var(--gold);box-shadow:inset 0 3px 0 
 .tile svg{width:30px;height:30px;color:var(--gold)}
 .tile b{font-size:15px}
 .tile small{color:var(--mut);font-size:12px}
-.counter{display:grid;place-items:center;margin:10px auto;width:min(72vw,280px);aspect-ratio:1;border-radius:50%;border:0;background:radial-gradient(circle at 50% 40%,#1b1709,#0b0b0c 70%);box-shadow:0 0 0 3px var(--gold2),0 0 0 9px #0b0b0c,0 0 0 11px rgb(201 162 74/.6),0 0 40px rgb(230 180 70/.25);color:var(--goldb);font-size:64px;font-weight:800;touch-action:manipulation}
+.counter{display:grid;place-items:center;margin:10px auto;width:min(72vw,280px);aspect-ratio:1;border-radius:50%;border:0;background:radial-gradient(circle at 50% 40%,#1b1709,#0b0b0c 70%);box-shadow:0 0 0 3px var(--gold2),0 0 0 9px #0b0b0c,0 0 0 11px rgb(201 162 74/.6),0 0 40px rgb(230 180 70/.25);color:var(--goldb);font-size:64px;font-weight:800;touch-action:manipulation;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
 .counter small{display:block;font-size:14px;color:var(--mut);font-weight:400}
 table.tt{width:100%;border-collapse:collapse;font-size:14px}
 table.tt th,table.tt td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:center}
@@ -139,3 +139,17 @@ table.tt tr.today td{background:rgb(255 215 106/.1);color:var(--goldb);font-weig
 .fz-l{padding-left:22px;margin:6px 0}
 .fz-l li{margin:4px 0}
 .saw{font-family:"Amiri Quran",Amiri,serif;font-size:1.5em;line-height:1;vertical-align:-.1em;font-weight:400}
+/* So'zma-so'z ergashish: marker (joy o'zgarmasligi uchun padding emas, box-shadow). Rang: --wmark (Sozlamalar) */
+.ar .w{border-radius:6px;transition:background-color .15s,box-shadow .15s}
+.ar .w.wnow{background:var(--wmark,rgb(250 199 117/.42));box-shadow:0 0 0 3px var(--wmark,rgb(250 199 117/.42))}
+/* Tasbeh donalari (3D): ip har bosishda bir dona aylanadi, sanalgan donalar oltin */
+.tsb{position:relative;width:min(86vw,320px);aspect-ratio:1;margin:8px auto}
+.tsb-ring{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.tsb .counter{position:absolute;left:17%;top:17%;width:66%;margin:0;font-size:56px}
+.tsb-str{transform-origin:150px 150px;transition:transform .35s cubic-bezier(.3,1.35,.6,1);filter:drop-shadow(0 2px 1.5px rgb(0 0 0/.28))}
+.bd circle{fill:url(#bg0)} .bd.on circle{fill:url(#bg1)} .bh{fill:#fff;opacity:.5}
+.bd{transform-box:fill-box;transform-origin:center} .bd.pop{animation:bpop .35s ease}
+@keyframes bpop{50%{transform:scale(1.35)}}
+.tsb.full .tsb-ring{animation:tfull .9s ease}
+@keyframes tfull{40%{filter:drop-shadow(0 0 10px rgb(250 199 117/.95))}}
+@media (prefers-reduced-motion:reduce){.tsb-str{transition:none}.bd.pop,.tsb.full .tsb-ring{animation:none}}
