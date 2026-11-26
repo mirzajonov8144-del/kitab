@@ -8,8 +8,8 @@ Egasi: Mc Raximjon (GitHub: mirzajonov8144-del). U texnik mutaxassis emas.
 
 ## Loyiha
 Qur'on o'quv ilovasi. Telefon uchun PWA, build (yig'ish) bosqichi yo'q: oddiy HTML, CSS va JS.
-- Sinov sayti (GitHub Pages): https://mirzajonov8144-del.github.io/kitab/ — `claude/project-thread-8e57y8` branch'idan, "/ (root)" papkasidan.
-- PR #1: shu branch'dan `main` ga. Hali birlashtirilmagan.
+- Sinov sayti (GitHub Pages): https://mirzajonov8144-del.github.io/kitab/ — `main` branch'idan, "/ (root)" papkasidan (egasi qarori, 2026-11-26). Ish `claude/project-thread-8e57y8` branch'ida qilinadi va PR orqali `main` ga qo'shiladi; sayt faqat birlashtirilgandan keyin yangilanadi.
+- PR #1 (Duolar'gacha) 2026-11-25 da `main` ga birlashtirilgan, branch o'chirilgan va Pages o'chib qolgan edi. 2026-11-26: Pages `main` dan qayta yoqildi. PR #2: Hadislar.
 - Repo ochiq. Egasining qarori (2026-11-25): ish tugaguncha repo ochiq turishi mumkin. O'zbekiston musulmonlari idorasi ruxsati Google Play yoki ijtimoiy tarmoqlarga chiqarishdan OLDIN olinadi.
 
 ## Fayllar
