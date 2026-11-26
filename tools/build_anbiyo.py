@@ -7,8 +7,13 @@ the app shows verses from data/s/NNN.json (Tanzil Arabic, QuranEnc translations 
 Source for "25 prophets are named in the Quran, the first is Adam, the last is Muhammad":
   O'zbekiston musulmonlari idorasi, muslim.uz, "Иймон" (30.01.2019), https://muslim.uz/oz/e/post/28371-iymon
 That article does not list the 25 names, so the list below is the 25 names that occur in the Arabic text and are
-written as names in the Uzbek translation (both checked by machine). Order: Adam first and Muhammad last (as in the
-article); the others in the order of their first mention in the Mushaf (computed, not a claim about history).
+written as names in the Uzbek translation (both checked by machine).
+
+Order (owner's request, 2026-11-26: "from Adam to Muhammad, in their order"): the numbered list 1-25 of
+  O'zbekiston musulmonlari idorasi, muslim.uz, "Эътиқод дурдонлари: ПАЙҒАМБАРЛАР ВА ФАРИШТАЛАРГА ИЙМОН КЕЛТИРИШ
+  БАЁНИ" (13.03.2021), https://muslim.uz/oz/e/post/14084-e-tiqod-durdonlari-payg-ambarlar-va-farishtalarga-iymon-keltirish-bayoni
+ORDER_TEXT below is that list exactly as the page has it (retrieved 2026-11-26; on the page the "1." is the list
+number, from <ol>). The article does not call it a historical order; the app says "as in the article".
 
 A verse is listed for a prophet when BOTH hold (checked by machine):
   - its Arabic text (Tanzil) contains one of the prophet's Arabic name forms as a whole word
@@ -63,6 +68,25 @@ ANBIYO = [
     ("iyso", "Iyso", r"Ийсо|Масийҳ", ["عيسي", "المسيح"]),
     ("muhammad", "Muhammad ﷺ", r"Муҳаммад|Аҳмад", ["محمد", "احمد"]),
 ]
+# The muslim.uz list, verbatim (see the docstring), and each of its names -> our key, in its order.
+ORDER_TEXT = ("Одам; 2. Идрис; 3. Нуҳ; 4. Ҳуд; 5. Солиҳ; 6. Иброҳим; 7. Лут; 8. Исмоил; 9. Исҳоқ; 10. Яъқуб; "
+              "11. Юсуф; 12. Айюб; 13. Шуайб; 14. Мусо; 15. Ҳорун; 16. Юнус; 17. Довуд; 18. Сулаймон; 19. Илёс; "
+              "20. Ал-Ясаъ; 21. Закариё; 22. Яҳё; 23. Зул-кифл; 24. Исо ва 25. Муҳаммад алайҳиссаломлар.")
+ORDER = [("Одам", "odam"), ("Идрис", "idris"), ("Нуҳ", "nuh"), ("Ҳуд", "hud"), ("Солиҳ", "solih"),
+         ("Иброҳим", "ibrohim"), ("Лут", "lut"), ("Исмоил", "ismoil"), ("Исҳоқ", "ishoq"), ("Яъқуб", "yaqub"),
+         ("Юсуф", "yusuf"), ("Айюб", "ayyub"), ("Шуайб", "shuayb"), ("Мусо", "muso"), ("Ҳорун", "horun"),
+         ("Юнус", "yunus"), ("Довуд", "dovud"), ("Сулаймон", "sulaymon"), ("Илёс", "ilyos"), ("Ал-Ясаъ", "alyasa"),
+         ("Закариё", "zakariyo"), ("Яҳё", "yahyo"), ("Зул-кифл", "zulkifl"), ("Исо", "iyso"), ("Муҳаммад", "muhammad")]
+# check: the names stand in ORDER_TEXT in this order, each with its number (the first one has none on the page)
+_pos = 0
+for _n, (_name, _key) in enumerate(ORDER, 1):
+    _m = re.compile((rf"{_n}\. " if _n > 1 else "^") + re.escape(_name) + r"(?=[; ])").search(ORDER_TEXT, _pos)
+    if not _m:
+        sys.exit(f"ORDER: {_n}. {_name} not found in ORDER_TEXT")
+    _pos = _m.end()
+if sorted(k for _, k in ORDER) != sorted(a[0] for a in ANBIYO):
+    sys.exit("ORDER keys differ from ANBIYO keys")
+
 KUNYA = {"ابو", "ابي", "ابا"}
 PREFIX = re.compile(r"^[وفبلكي]{0,2}$")
 
@@ -119,9 +143,9 @@ for key, label, urx, forms in ANBIYO:
     report.append(f"{label}: {len(refs)} oyat | faqat arabchada: {ar_only[:12]}"
                   f" | faqat tarjimada: {len(uz_only)} {uz_only[:8]}")
 
-# order: Adam first, Muhammad last, the rest by first mention
-mid = sorted(items[1:-1], key=lambda x: tuple(map(int, x["first"].split(":"))))
-items = [items[0]] + mid + [items[-1]]
+# order: as the muslim.uz list (ORDER)
+rank = {k: i for i, (_, k) in enumerate(ORDER)}
+items.sort(key=lambda x: rank[x["key"]])
 if len(items) != 25:
     sys.exit(f"{len(items)} prophets, expected 25")
 
@@ -150,6 +174,13 @@ out = {
     "count_source": {
         "title": "Иймон", "site": "O'zbekiston musulmonlari idorasi (muslim.uz)", "date": "30.01.2019",
         "url": "https://muslim.uz/oz/e/post/28371-iymon", "retrieved": "2026-11-26",
+    },
+    "order_source": {
+        "title": "Эътиқод дурдонлари: ПАЙҒАМБАРЛАР ВА ФАРИШТАЛАРГА ИЙМОН КЕЛТИРИШ БАЁНИ",
+        "site": "O'zbekiston musulmonlari idorasi (muslim.uz)", "date": "13.03.2021",
+        "url": "https://muslim.uz/oz/e/post/14084-e-tiqod-durdonlari-payg-ambarlar-va-farishtalarga-iymon-keltirish-bayoni",
+        "retrieved": "2026-11-26", "lead": "Қуръони каримда 25  нафар пайғамбарларнинг номлари зикр қилинган:",
+        "list": "ol", "text": ORDER_TEXT,
     },
     "sources": {
         "ar": suras[1]["tanzil_notice"],
