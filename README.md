@@ -1,4 +1,4 @@
-# Kitab
+# Mehrob (loyiha: kitab)
 
 Qur'on o'quv ilovasi (PWA, telefon uchun). **Sinov versiyasi — O'zbekiston musulmonlari idorasi tasdiqlamaguncha ommaga chiqarilmaydi.**
 

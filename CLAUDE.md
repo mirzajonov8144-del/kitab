@@ -7,7 +7,7 @@ Egasi: Mc Raximjon (GitHub: mirzajonov8144-del). U texnik mutaxassis emas.
 - Pullik yoki ortga qaytarib bo'lmaydigan ishdan (o'chirish, nashr qilish, to'lov) oldin egasidan ruxsat so'rang.
 
 ## Loyiha
-Qur'on o'quv ilovasi. Telefon uchun PWA, build (yig'ish) bosqichi yo'q: oddiy HTML, CSS va JS.
+Qur'on o'quv ilovasi. Ilova nomi — «Mehrob» (egasi qarori, 2026-11-26; avval «Kitab»). Logo: feruza ravoq, ichida oltin sakkiz qirrali yulduz, marvarid fon (`icons/`). Repo, papka, `localStorage` kalitlari (`kitab.*`) va kesh nomi (`kitab-vN`) eski nomda qoladi: o'zgartirilsa, foydalanuvchi sozlamalari yo'qoladi. Google Play'dan oldin shu nomdagi boshqa ilova bor-yo'qligini tekshiring. Telefon uchun PWA, build (yig'ish) bosqichi yo'q: oddiy HTML, CSS va JS.
 - Sinov sayti (GitHub Pages): https://mirzajonov8144-del.github.io/kitab/ — `main` branch'idan, "/ (root)" papkasidan (egasi qarori, 2026-11-26). Ish `claude/project-thread-8e57y8` branch'ida qilinadi va PR orqali `main` ga qo'shiladi; sayt faqat birlashtirilgandan keyin yangilanadi.
 - PR #1 (Duolar'gacha) 2026-11-25 da `main` ga birlashtirilgan, branch o'chirilgan va Pages o'chib qolgan edi. 2026-11-26: Pages `main` dan qayta yoqildi. PR #2: Hadislar.
 - Repo ochiq. Egasining qarori (2026-11-25): ish tugaguncha repo ochiq turishi mumkin. O'zbekiston musulmonlari idorasi ruxsati Google Play yoki ijtimoiy tarmoqlarga chiqarishdan OLDIN olinadi.
