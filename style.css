@@ -127,12 +127,14 @@ table.tt tr.today td{background:rgb(255 215 106/.1);color:var(--goldb);font-weig
 .vid.off{background:var(--panel)}
 .vid.off p{margin:0 0 12px;color:var(--ink)}
 .vid.off .btn{display:inline-block;text-decoration:none}
-/* Hadislar */
-.hd-t{margin:0 0 6px;color:var(--gold)}
-.hd-ar{font-size:calc(var(--arsize,28px) * .78);line-height:2.1}
-.hd summary{color:var(--gold);cursor:pointer;padding:6px 0}
-.hd ul.fn{padding-left:20px}
-.hd .farq-row{grid-template-columns:1fr}
 /* Payg'ambarlar */
 .anb-g summary{cursor:pointer;padding:2px 0}
 .anb-g .ayah:first-child{margin-top:8px}
+/* Farzlar */
+.fz-nav{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.fz-nav a{padding:6px 10px;border:1px solid var(--line,currentColor);border-radius:999px;font-size:14px;text-decoration:none;color:inherit}
+.fz{scroll-margin-top:80px}
+.fz-h{color:var(--gold)}
+.fz-t p{margin:6px 0}
+.fz-l{padding-left:22px;margin:6px 0}
+.fz-l li{margin:4px 0}
