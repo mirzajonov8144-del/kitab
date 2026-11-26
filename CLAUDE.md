@@ -52,6 +52,7 @@ Lokal ishga tushirish: `python3 -m http.server 8000`, keyin brauzerda http://loc
 7. Hamma diniy matn olim tekshiruvidan o'tguncha "Olim tekshiruvi kerak" holatida qoladi.
 8. Istisno (egasi qarori, 2026-11-25): manbada o'zbekcha tarjima bo'lmasa, Claude manbadagi ruscha yoki inglizcha matnni o'zbekchaga o'giradi. Xotiradan emas, faqat manbadagi matndan. Bunday tarjima alohida faylda saqlanadi (masalan, `data/zikr-uz-claude.json`) va ilovada "Manba emas" belgisi hamda qaysi matndan o'girilgani bilan ko'rsatiladi. Ilova bitgach, Idora tekshiradi. Arabcha matn, oyat, yangi duo va hadis bu istisnoga kirmaydi.
 9. Istisno (egasi qarori, 2026-11-25): tajvid qoidalarining izohini Claude yozadi ("Manba emas" belgisi bilan, Idora tekshiradi). Misollardagi Qur'on matni esa faqat `data/s/` dagi Tanzil matnidan kesib olinadi (`tools/build_tajvid.py`), qo'lda yozilmaydi.
+10. Payg'ambar Muhammad nomi yonida doim «ﷺ» belgisi bo'lsin (egasi qarori, 2026-11-26) — interfeys matnida (biz yozgan matnda). Manba matniga (oyat tarjimasi, muslim.uz matni) qo'shilmaydi: 2-qoida.
 
 Ruxsat etilgan manbalar:
 - Asosiy: O'zbekiston musulmonlari idorasi (muslim.uz).

@@ -33,6 +33,7 @@ def bare(w):
 def tokens(ar):
     return [bare(w) for w in ar.split()]
 
+# Owner's rule (2026-11-26): the Prophet Muhammad's name always carries ﷺ in interface text (never added to source text).
 # (key, label (Latin, interface), Uzbek name regex (Cyrillic, search key only), Arabic bare name forms)
 # A form with a space is a two-word name (e.g. ذا الكفل is matched on its second word with the first before it).
 ANBIYO = [
@@ -60,7 +61,7 @@ ANBIYO = [
     ("zakariyo", "Zakariyo", r"Закариё", ["زكريا"]),
     ("yahyo", "Yahyo", r"Яҳё", ["يحيي"]),
     ("iyso", "Iyso", r"Ийсо|Масийҳ", ["عيسي", "المسيح"]),
-    ("muhammad", "Muhammad", r"Муҳаммад|Аҳмад", ["محمد", "احمد"]),
+    ("muhammad", "Muhammad ﷺ", r"Муҳаммад|Аҳмад", ["محمد", "احمد"]),
 ]
 KUNYA = {"ابو", "ابي", "ابا"}
 PREFIX = re.compile(r"^[وفبلكي]{0,2}$")

@@ -399,18 +399,18 @@ const VIEWS = {
     const it = route.arg && d.items[route.arg - 1];
     if (!it) return `<div class="card"><h2>${T("Payg'ambarlar")}</h2>
       <div class="note">${T("Olim tekshiruvi kerak.")} ${T("Payg'ambarlar hech qachon tasvirlanmaydi: bu bo'limda faqat oyat matni bor.")}</div>
-      <p class="mut">${T("Manba")}: <a href="${esc(d.count_source.url)}" target="_blank" rel="noopener">muslim.uz, «${T("Iymon")}» (${esc(d.count_source.date)})</a> — ${T("Qur'oni karimda 25 payg'ambarning nomi zikr qilingan, avvalgisi Odam, so'nggisi Muhammad (maqoladan qisqacha mazmun).")}</p>
+      <p class="mut">${T("Manba")}: <a href="${esc(d.count_source.url)}" target="_blank" rel="noopener">muslim.uz, «${T("Iymon")}» (${esc(d.count_source.date)})</a> — ${saw(T("Qur'oni karimda 25 payg'ambarning nomi zikr qilingan, avvalgisi Odam, so'nggisi Muhammad ﷺ (maqoladan qisqacha mazmun)."))}</p>
       <details><summary class="mut">${T("Ro'yxat qanday tuzildi?")}</summary>
         <p class="mut">${T("Maqolada 25 ism sanab berilmagan. Shuning uchun ro'yxatga Qur'onning arabcha matnida ham, o'zbekcha tarjimasida ham ism sifatida kelgan 25 payg'ambar olindi (dastur bilan tekshirildi).")}</p>
-        <p class="mut">${T("Tartib: Odam birinchi, Muhammad oxirida (maqoladagidek). Qolganlari Qur'onda birinchi marta zikr qilingan joyi bo'yicha (bu tarixiy tartib emas).")}</p>
+        <p class="mut">${saw(T("Tartib: Odam birinchi, Muhammad ﷺ oxirida (maqoladagidek). Qolganlari Qur'onda birinchi marta zikr qilingan joyi bo'yicha (bu tarixiy tartib emas)."))}</p>
         <p class="mut">${T("Oyatlar: arabcha matnda payg'ambar ismi bor va tarjimada ham shu ism yozilgan oyatlar.")}</p>
         <p class="mut">${T("Ro'yxatni {Claude} (sun'iy intellekt) shu mezon bo'yicha tuzgan — bu manba emas.")}</p></details></div>
-      <div class="grid">${d.items.map((x, i) => `<button class="tile" data-nabiy="${i + 1}"><b>${T(x.label)}</b><small>${T(honor(x))}</small><small>${x.n} ${T("oyat")}</small></button>`).join("")}</div>${src}`;
+      <div class="grid">${d.items.map((x, i) => `<button class="tile" data-nabiy="${i + 1}"><b>${saw(T(x.label))}</b><small>${T(honor(x))}</small><small>${x.n} ${T("oyat")}</small></button>`).join("")}</div>${src}`;
     const sec = (title, groups, note = "") => {
       const n = groups.reduce((k, g) => k + g.a.length, 0), open = n <= 8;
       return `<div class="card"><h3>${T(title)} (${n})</h3>${note}</div>${groups.map(g => anbGroup(g, open)).join("")}`;
     };
-    return `<div class="card"><h2>${T(it.label)} <small class="mut">${T(honor(it))}</small></h2>
+    return `<div class="card"><h2>${saw(T(it.label))} <small class="mut">${T(honor(it))}</small></h2>
       <div class="note">${T("Olim tekshiruvi kerak.")} ${T("Payg'ambarlar hech qachon tasvirlanmaydi.")} ${T("Oyatlar manbadan o'zgarishsiz olingan; ro'yxatni {Claude} tuzgan, manba emas.")}</div>
       <p class="mut">${T("Qur'onda birinchi zikri")}: ${esc(it.first)}</p></div>
       ${sec("Qur'onda nomi zikr qilingan oyatlar", it.verses)}
@@ -538,7 +538,8 @@ function markDuo() {
   const r = [...document.querySelectorAll("[data-pr]")].find(x => { const [s, a, e] = x.dataset.pr.split(":").map(Number); return s === pl.sura && a <= pl.ayah && pl.ayah <= e; });
   if (r) { r.setAttribute("aria-pressed", "true"); r.textContent = T("❚❚ To'xtatish"); }
 }
-/* Payg'ambar ismidan keyingi duo (interfeys matni). */
+/* Payg'ambar ismidan keyingi duo (interfeys matni). «ﷺ» belgisi kattaroq ko'rinsin (egasi qarori, 2026-11-26). */
+const saw = h => h.replaceAll("ﷺ", '<span class="saw">ﷺ</span>');
 const honor = x => x.key === "muhammad" ? "sollallohu alayhi va sallam" : "alayhissalom";
 /* Payg'ambarlar: bitta suradagi oyatlar guruhi. Matn ochilganda data/s/ dan yuklanadi (fillAnb). */
 function anbGroup(g, open) {
