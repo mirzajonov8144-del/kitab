@@ -1,5 +1,5 @@
 "use strict";
-/* Kitab — o'quv ilovasi (sinov versiyasi).
+/* Mehrob (loyiha nomi: kitab) — o'quv ilovasi (sinov versiyasi).
    Diniy matnlar faqat data/ papkasidagi manba fayllardan olinadi (Tanzil, QuranEnc, sunnah.com, HadeethEnc).
    Bu faylda hech qanday oyat, tarjima, duo yoki hadis matni yozilmagan. */
 
@@ -149,7 +149,7 @@ function playAyah(s, a, mode) {
   if (a < meta.v) preload.src = audioURL(s, a + 1);
   markAyah();
   if ("mediaSession" in navigator) {
-    navigator.mediaSession.metadata = new MediaMetadata({ title: `${sname(meta)} ${s}:${a}`, artist: reciter().name, album: "Kitab" });
+    navigator.mediaSession.metadata = new MediaMetadata({ title: `${sname(meta)} ${s}:${a}`, artist: reciter().name, album: "Mehrob" });
   }
   updPlayer();
 }
@@ -236,8 +236,8 @@ function parseHash() { const [n, a] = location.hash.slice(1).split("/"); return 
 function shell() {
   const top = TABS.some(t => t[0] === route.name);
   $("#back").classList.toggle("hide", top);
-  $("#title").textContent = route.name === "sura" ? `${route.arg}. ${sname(SURAS[route.arg - 1])}` : T(TITLES[route.name] || "Kitab");
-  if (route.name === "quran") $("#title").textContent = "Kitab";
+  $("#title").textContent = route.name === "sura" ? `${route.arg}. ${sname(SURAS[route.arg - 1])}` : T(TITLES[route.name] || "Mehrob");
+  if (route.name === "quran") $("#title").textContent = T("Mehrob");
   $("#lat").setAttribute("aria-pressed", st.script === "lat"); $("#kir").setAttribute("aria-pressed", st.script === "kir");
   const active = route.name === "sura" ? "quran" : (TABS.some(t => t[0] === route.name) ? route.name : "yana");
   $("#nav").innerHTML = TABS.map(([k, l, i]) => `<button data-tab="${k}" ${k === active ? 'aria-current="page"' : ""}>${ICON(i)}<span>${T(l)}</span></button>`).join("");
