@@ -109,6 +109,8 @@ async function getJSON(url) { const r = await fetch(url); if (!r.ok) throw new E
 const sname = s => s.uz || s.lat;
 let zikrCache = null;
 async function loadZikr() { return zikrCache ||= await getJSON("data/zikr.json"); }
+let hadisCache = null;
+async function loadHadis() { return hadisCache ||= await getJSON("data/hadis.json"); }
 let duoCache = null;
 async function loadDuolar() { return duoCache ||= await getJSON("data/duolar.json"); }
 async function loadSura(n) {
@@ -207,6 +209,7 @@ const TABS = [
 ];
 const ICON = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
 const MORE = [
+  ["hadis", "Hadislar", "Sahih al-Buxoriy, sharhi bilan", '<path d="M6 3h9l3 3v15H6z"/><path d="M9 9h6M9 13h6M9 17h4"/>'],
   ["duolar", "Duolar", "Qur'ondagi duolar", '<path d="M8 21v-5L5 11l1.5-1.5L10 13"/><path d="M16 21v-5l3-5-1.5-1.5L14 13"/><path d="M12 3l1 2 2 .3-1.5 1.4.4 2.1L12 7.8 10.1 8.8l.4-2.1L9 5.3l2-.3z"/>'],
   ["ramazon", "Ramazon taqvimi", "Saharlik va iftorlik vaqtlari", '<path d="M15 3a9 9 0 1 0 6 15A7 7 0 0 1 15 3z"/>'],
   ["jonli", "Makka va Madina", "Jonli efir", '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M10 10l5 2.5-5 2.5z"/>'],
@@ -351,6 +354,21 @@ const VIEWS = {
           <div class="tj-exs">${r.ex.map(ex).join("")}</div></div>`).join("")}
       </details></div>`).join("")}`;
   },
+  /* Hadislar: data/hadis.json (tools/build_hadis.py). Matn, tarjima, sharh — HadeethEnc; raqam — sunnah.com (Buxoriy). */
+  async hadis() {
+    let d = null;
+    try { d = await loadHadis(); } catch {}
+    if (!d) return `<div class="card"><h2>${T("Hadislar")}</h2><p class="mut">${T("Hadislarni yuklab bo'lmadi. Internetni tekshiring.")}</p></div>`;
+    const cat = store.get("hcat", "");
+    return `<div class="card"><h2>${T("Hadislar")}</h2>
+      <div class="note">${T("Olim tekshiruvi kerak.")} ${T("Hadis matni, o'zbekcha tarjimasi va sharhi {HadeethEnc}'dan o'zgarishsiz olingan. Har bir hadisning so'zlari {sunnah.com}'dagi Sahih al-Buxoriy matnida harfma-harf topilgan va raqami shu yerdan olingan. Buxoriyda so'zma-so'z topilmagan hadislar hozircha qo'shilmadi.")}</div>
+      <div class="row"><label for="hcat">${T("Bo'lim")}</label><select id="hcat"><option value="">${T("Hammasi")} (${d.items.length})</option>${d.cats.map(c => `<option value="${c.id}" ${c.id === cat ? "selected" : ""} lang="uz-Cyrl">${esc(c.title)} (${c.n})</option>`).join("")}</select></div>
+      <input class="search" id="hq" type="search" placeholder="${T("Qidirish (so'z yoki raqam)")}" aria-label="${T("Hadis qidirish")}">
+      <p class="mut" id="hcount"></p></div>
+      <div id="hlist"></div>
+      <div class="row" style="justify-content:center"><button class="btn2" id="hmore">${T("Yana ko'rsatish")}</button></div>
+      <div class="card"><p class="src" style="margin-top:0;border:0;padding:0">${T("Matn, tarjima, daraja va sharh")}: <a href="https://hadeethenc.com" target="_blank" rel="noopener">HadeethEnc.com</a> (${T("o'zbekcha")}). ${T("Hadis raqami")}: <a href="https://sunnah.com/bukhari" target="_blank" rel="noopener">sunnah.com</a> — Sahih al-Bukhari. ${T("Olingan")}: ${esc(d.retrieved)}. <br>${T("Holat: olim tekshiruvi kutilmoqda.")}</p></div>`;
+  },
   /* Duolar: data/duolar.json (tools/build_duolar.py). Oyat va tarjimalar data/s/ dan o'zgarishsiz; tanlov — Claude, manba emas. */
   async duolar() {
     let d = null;
@@ -407,6 +425,7 @@ const VIEWS = {
     <li>${T("Namoz vaqtlari")}: Aladhan API (${T("taxminiy")}), ${T("Idora Fatvo markazining taqvim botiga moslangan")}; ${T("rasmiy")}: <a href="https://t.me/fatvouz_taqvim_bot" target="_blank" rel="noopener">@fatvouz_taqvim_bot</a>, <a href="https://muslim.uz" target="_blank" rel="noopener">muslim.uz</a>.</li>
     <li>${T("Sura nomlari (o'zbekcha)")}: <a href="https://quranenc.com/uz/browse/uzbek_sadiq/1" target="_blank" rel="noopener">QuranEnc.com</a> — ${T("o'zgartirilmagan, kirillda. Olim tekshiruvi kerak.")}</li>
     <li>${T("Tasbeh zikrlari")}: <a href="https://sunnah.com/bukhari" target="_blank" rel="noopener">sunnah.com</a> — Sahih al-Bukhari 843, 6403, 6405; ${T("tarjima va solishtirish")}: <a href="https://hadeethenc.com" target="_blank" rel="noopener">HadeethEnc</a>. ${T("843 va 6403 ning o'zbekcha tarjimasi manbada yo'q: ularni {Claude} (sun'iy intellekt) manbadagi inglizcha/ruscha matndan o'girgan, bu manba emas.")} ${T("Olim tekshiruvi kerak.")}</li>
+    <li>${T("Hadislar")}: ${T("matn, o'zbekcha tarjima, daraja va sharh")} — <a href="https://hadeethenc.com" target="_blank" rel="noopener">HadeethEnc.com</a>, ${T("o'zgartirilmagan, kirillda")}; ${T("hadis raqami")} — <a href="https://sunnah.com/bukhari" target="_blank" rel="noopener">sunnah.com</a> (Sahih al-Bukhari). ${T("Har bir hadisning so'zlari Buxoriy matnida harfma-harf topilgan; harakatlarda farq bo'lsa, ikkalasi ko'rsatiladi.")} ${T("Olim tekshiruvi kerak.")}</li>
     <li>${T("Duolar")}: ${T("oyatlar va tarjimalar yuqoridagi manbalardan ({Tanzil}, {QuranEnc.com}) o'zgarishsiz olingan. Duolar ro'yxatini {Claude} (sun'iy intellekt) tanlagan, bu manba emas: {muslim.uz} va {sunnah.com} ({Hisn al-Muslim})da tayyor ro'yxat topilmadi.")} ${T("Olim tekshiruvi kerak.")}</li>
     <li>${T("Jonli efir")}: ${LIVE.map(l => `<a href="https://www.youtube.com/channel/${encodeURIComponent(l.channel)}" target="_blank" rel="noopener">${esc(l.handle)}</a>`).join(", ")} — ${T("Saudiya Radio va Televideniye idorasi ({SBA}), YouTube.")}</li></ul>
     <p class="mut">${T("Arabcha matn ikkinchi manba ({QuranEnc}) bilan 6236 oyat bo'yicha solishtirildi. Natija: {docs/tekshiruv-hisoboti.md}.")}</p>
@@ -444,6 +463,25 @@ function zikrCard(z, sel) {
       <p class="mut">${T("Hadisning to'liq arabcha matni")}:</p><p class="ar zk-full" dir="rtl" lang="ar">${esc(z.hadith_ar)}</p>
     </details>
   </div>`;
+}
+/* Hadis kartasi: hamma matn data/hadis.json dan, o'zgarishsiz; T() va toCyr dan o'tmaydi. */
+function hadisCard(h) {
+  const arP = s => `<span class="ar" dir="rtl" lang="ar">${esc(s)}</span>`;
+  const farq = h.bukhari.compare.filter(x => x.farq);
+  return `<div class="card hd">
+    <p class="hd-t" lang="uz-Cyrl"><b>${esc(h.title)}</b></p>
+    <p class="ar hd-ar" dir="rtl" lang="ar">${esc(h.ar)}</p>
+    <p class="tr" lang="uz-Cyrl">${esc(h.uz)}</p>
+    <p class="src"><a href="${esc(h.bukhari.url)}" target="_blank" rel="noopener">Sahih al-Bukhari ${esc(h.bukhari.num)}</a> (sunnah.com) ·
+      ${T("Daraja")}: <span lang="uz-Cyrl">${esc(h.grade)}</span> · <span lang="uz-Cyrl">${esc(h.attribution)}</span> ·
+      <a href="${esc(h.url)}" target="_blank" rel="noopener">HadeethEnc #${esc(h.id)}</a></p>
+    ${farq.length ? `<details class="farq"><summary><b class="farq-badge">FARQ BOR</b> ${T("Buxoriy matni bilan harakatlarda farq bor")}</summary>
+      <p class="mut">${T("So'zlar bir xil, lekin harakat (unli belgilari) farq qiladi. Qaysi biri olinishini olim aytadi.")}</p>
+      ${farq.map(x => `<div class="farq-row"><div><small>sunnah.com (Bukhari ${esc(h.bukhari.num)})</small>${arP(x.sunnah)}</div><div><small>HadeethEnc #${esc(h.id)}</small>${arP(x.hadeethenc)}</div></div>`).join("")}</details>` : `<p class="src">${T("Buxoriy matni bilan harfma-harf mos (harakatlari ham).")}</p>`}
+    <details><summary>${T("Sharh va foydalar")} (HadeethEnc)</summary>
+      <p class="fn" lang="uz-Cyrl">${esc(h.explanation)}</p>
+      ${h.hints.length ? `<ul class="fn" lang="uz-Cyrl">${h.hints.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+    </details></div>`;
 }
 /* Duo kartasi: oyat va tarjima data/duolar.json dan, o'zgarishsiz. Diniy matn T() va toCyr dan o'tmaydi. */
 const TRLANG = { uz: "uz-Cyrl", ru: "ru", en: "en" };
@@ -517,6 +555,26 @@ function liveWatch() {
 
 const AFTER = {
   jonli() { liveWatch(); },
+  hadis() {
+    if (!hadisCache) return;
+    const PAGE = 15;
+    let shown = PAGE;
+    const list = () => {
+      const cat = $("#hcat").value, q = $("#hq").value.trim().toLowerCase(), qc = toCyr(q).toLowerCase();
+      return hadisCache.items.filter(h => (!cat || h.cat === cat) && (!q || h.bukhari.num === q || h.id === q
+        || [h.title, h.uz].some(t => t.toLowerCase().includes(q) || t.toLowerCase().includes(qc))));
+    };
+    const draw = () => {
+      const L = list();
+      $("#hlist").innerHTML = L.slice(0, shown).map(hadisCard).join("");
+      $("#hcount").textContent = `${T("Topildi")}: ${L.length}`;
+      $("#hmore").classList.toggle("hide", shown >= L.length);
+    };
+    $("#hcat").onchange = e => { store.set("hcat", e.target.value); shown = PAGE; draw(); };
+    $("#hq").oninput = () => { shown = PAGE; draw(); };
+    $("#hmore").onclick = () => { shown += PAGE; draw(); };
+    draw();
+  },
   duolar() {
     document.querySelectorAll("[data-dgroup]").forEach(b => b.onclick = () => { store.set("dgroup", b.dataset.dgroup); render(); });
     markDuo();

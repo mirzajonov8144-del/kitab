@@ -127,3 +127,9 @@ table.tt tr.today td{background:rgb(255 215 106/.1);color:var(--goldb);font-weig
 .vid.off{background:var(--panel)}
 .vid.off p{margin:0 0 12px;color:var(--ink)}
 .vid.off .btn{display:inline-block;text-decoration:none}
+/* Hadislar */
+.hd-t{margin:0 0 6px;color:var(--gold)}
+.hd-ar{font-size:calc(var(--arsize,28px) * .78);line-height:2.1}
+.hd summary{color:var(--gold);cursor:pointer;padding:6px 0}
+.hd ul.fn{padding-left:20px}
+.hd .farq-row{grid-template-columns:1fr}
